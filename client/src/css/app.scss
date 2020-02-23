@@ -1,0 +1,57 @@
+$primary: #0000A0;
+
+@import '../../node_modules/bootstrap/scss/bootstrap.scss';
+@import 'toastr';
+
+a {
+  &:not([href]):not([tabindex]) {
+    color: $primary;
+
+    &.color-inherit {
+      color: inherit;
+    }
+  }
+
+  &.color-inherit {
+    color: inherit;
+  }
+
+  cursor: pointer;
+}
+
+label {
+  margin-bottom: 0px;
+}
+
+.small-gutters {
+  margin-right: -5px;
+  margin-left: -5px;
+
+  > .col,
+  > [class*="col-"] {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+}
+
+.form-control {
+  &.danger, &.danger:hover {
+    border-color: $danger;
+  }
+
+  &.warning, &.warning:hover {
+    border-color: $warning;
+  }
+
+  &.info, &.info:hover {
+    border-color: $info;
+  }
+
+  &.success, &.success:hover {
+    border-color: $success;
+  }
+
+  &.form-control-vsm:not([size]):not([multiple]) {
+    height: calc(1.38845rem + 2px);
+  }
+}

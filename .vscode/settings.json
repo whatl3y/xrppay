@@ -1,0 +1,9 @@
+{
+  "editor.formatOnSave": false,
+  "editor.tabSize": 2,
+  "editor.wordWrap": "off",
+  "editor.renderWhitespace": "all",
+  "prettier.semi": false,
+  "prettier.singleQuote": true,
+  "prettier.vueIndentScriptAndStyle": true
+}

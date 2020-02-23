@@ -1,0 +1,8 @@
+{
+  "watch": [
+    "src/**/*.jssss"
+  ],
+  "events": {
+    "restart": "gulp build"
+  }
+}

@@ -1,0 +1,14 @@
+extends ../base.pug
+
+block content
+  if temp_pw
+    div Your temporary password to login to xrppay is below:
+    div(style="margin:15px 0px")
+      strong= temp_pw
+  if verification_link
+    div Please click the link below to verify your account with xrppay!
+    div(style="margin:15px 0px")
+      a(href=verification_link) Verify your account!
+  else
+    div
+      a(href=host) Login Now!

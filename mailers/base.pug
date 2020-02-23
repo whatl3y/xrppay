@@ -1,0 +1,37 @@
+- home_url = host || 'http://dev.xrppay.com:8080'
+
+html(xmlns='http://www.w3.org/1999/xhtml')
+  head
+    title xrppay
+  body(style='-webkit-text-size-adjust: none; font-family:Arial, Helvetica, sans-serif; margin-left:0px; margin-top:0px;')
+    small
+      table#body-table(border='0',cellpadding='0',cellspacing='0',height='100%',width='100%')
+        tbody
+          tr
+            td(valign="top",align="center",width="100%")
+              table#email-container(style="background-color: #fbfbfb;",border='0',cellpadding='5',cellspacing='0',width='600')
+                tbody
+                  tr
+                    td.main-header(style="overflow: hidden; background-color: #fbfbfb; border-bottom: 1px solid #f0f0f0; padding: 0px;",valign='top')
+                      div.header-wrapper
+                        div(style="float: left; width: 75%; padding-left: 15px; padding-top: 10px;")
+                          a(href=home_url)
+                            div xrppay
+                        div(style="float: right; text-align: right; width: 20%; margin: 20px 15px 0px 0px;")
+                          small
+                            a(href=home_url) Login
+                  tr
+                    td.main-wrapper(style="background-color: #fbfbfb; padding: 0px")
+                      div(style="margin: 20px;")
+                        block content
+                  tr
+                    td.main-footer(style='overflow: hidden; border-top: 1px solid #f0f0f0; background-color: #fbfbfb; padding:10px 10px;')
+                      small
+                        small
+                          table(border='0',cellpadding='5',cellspacing='0',width='600')
+                            tbody
+                              tr
+                                //- td
+                                //-   a(href=home_url + '/settings/communication') 
+                                //-     | Manage Communication Preferences
+                                td(style="text-align: right") Copyright 2020 © xrppay

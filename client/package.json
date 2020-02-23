@@ -1,0 +1,48 @@
+{
+  "name": "xrppay-client",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Lance Whatley <whatl3y@whatl3y.com>",
+  "private": true,
+  "scripts": {
+    "dev": "npm run serve",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "test": "vue-cli-service test:unit --require mocha.init.js"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.0.6",
+    "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.1.0",
+    "core-js": "^3.6.4",
+    "fastclick": "^1.0.6",
+    "fetch-defaults": "^1.0.0",
+    "moment": "^2.24.0",
+    "socket.io-client": "^2.3.0",
+    "toastr": "^2.1.4",
+    "vue": "^2.6.11",
+    "vue-router": "^3.1.5",
+    "vue-socket.io": "^3.0.7",
+    "vuex": "^3.1.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.2.2",
+    "@vue/cli-plugin-eslint": "^4.2.2",
+    "@vue/cli-plugin-unit-mocha": "^4.2.2",
+    "@vue/cli-service": "^4.2.2",
+    "@vue/test-utils": "^1.0.0-beta.31",
+    "babel-eslint": "^10.0.3",
+    "chai": "^4.1.2",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^6.1.2",
+    "isomorphic-fetch": "^2.2.1",
+    "jquery": "^3.4.1",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^8.0.0",
+    "sinon": "^7.3.1",
+    "vue-cli-plugin-pug": "~1.0.7",
+    "vue-cli-plugin-webpack-bundle-analyzer": "~2.0.0",
+    "vue-template-compiler": "^2.5.21"
+  }
+}

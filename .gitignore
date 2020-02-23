@@ -1,0 +1,11 @@
+# ignore
+*.log
+*.rdb
+*.serverless
+*.DS_Store
+*.nyc_output
+/dist
+/logs
+/node_modules
+/tmp
+*.env

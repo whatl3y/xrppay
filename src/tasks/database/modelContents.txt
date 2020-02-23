@@ -1,0 +1,16 @@
+import DatabaseModel from './DatabaseModel'
+
+export default function {Table}(postgres) {
+  const factoryToExtend = DatabaseModel(postgres, '{table}')
+
+  return Object.assign(
+    factoryToExtend,
+    {
+      accessibleColumns: [
+        'user_id',
+        'col2',
+        '...'
+      ]
+    }
+  )
+}

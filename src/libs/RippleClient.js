@@ -1,8 +1,9 @@
 import { RippleAPI } from 'ripple-lib'
 import { sleep } from './Helpers'
+import config from '../config'
 
 // https://xrpl.org/rippleapi-reference.html
-export default function RippleClient(serverUrl='wss://s1.ripple.com', options=null) {
+export default function RippleClient(serverUrl=config.ripple.rippledUrl, options=null) {
   const client = new RippleAPI({
     ...options,
     server: serverUrl
@@ -22,14 +23,31 @@ export default function RippleClient(serverUrl='wss://s1.ripple.com', options=nu
       return await this.client.disconnect()
     },
 
+    async getServerInfo() {
+      await this.connect()
+      return await this.client.getServerInfo()
+    },
+
     async getBalances(addr, options={}) {
       await this.connect()
       return await this.client.getBalances(addr, options)
     },
 
-    async getServerInfo() {
+    async getTransaction(txnHash, options={}) {
       await this.connect()
-      return await this.client.getServerInfo()
+      return await this.client.getTransaction(txnHash, options)
+    },
+
+    // https://xrpl.org/rippleapi-reference.html#gettransactions
+    async getTransactions(addr, options={}) {
+      await this.connect()
+      return await this.client.getTransactions(addr, options)
+    },
+
+    // https://xrpl.org/rippleapi-reference.html#getledger
+    async getLedger(version) {
+      await this.connect()
+      return await this.client.getLedger({ ledgerVersion: version })
     },
 
     async sendPayment(
@@ -65,6 +83,7 @@ export default function RippleClient(serverUrl='wss://s1.ripple.com', options=nu
         "LastLedgerSequence": currLedger + 4,
         ...prepareOptions
       })
+
       const response = this.client.sign(preparedTx.txJSON, sourceAddrSecret)
       const txID = response.id
       const txBlob = response.signedTransaction
@@ -103,7 +122,7 @@ export default function RippleClient(serverUrl='wss://s1.ripple.com', options=nu
     // https://xrpl.org/subscribe.html
     async subscribeToAddress(addr, txnCallback) {
       await this.client.connect()
-      this.client.on('transaction', txnCallback)
+      this.client.connection.on('transaction', txnCallback)
       const res = await this.client.request('subscribe', { accounts: [ addr ] })
       return res
     },
@@ -119,7 +138,11 @@ export default function RippleClient(serverUrl='wss://s1.ripple.com', options=nu
     },
 
     generateAddress(options={}) {
-      return this.client.generateXAddress(options)
+      return this.client.generateXAddress({
+        ...options,
+        includeClassicAddress: true,
+        test: !config.server.isProduction
+      })
     }
   }
 }

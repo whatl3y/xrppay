@@ -49,6 +49,9 @@ export default {
   },
 
   ripple: {
+    masterAddr: process.env.RIPPLE_X_ADDRESS,
+    masterClassicAddr: process.env.RIPPLE_CLASSIC_ADDR,
+    masterAddrSecret: process.env.RIPPLE_SECRET,
     rippledUrl: process.env.NODE_ENV === 'production' ? (process.env.RIPPLED_SERVER_URL || 'wss://s1.ripple.com') : 'wss://s.altnet.rippletest.net:51233'
   },
 

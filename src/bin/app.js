@@ -2,7 +2,7 @@
  * to listen for HTTP requests
  */
 
-import newrelic from 'newrelic'
+// import newrelic from 'newrelic'
 import bunyan from 'bunyan'
 import sticky from 'sticky-cluster'
 import WebServer from '../libs/WebServer'

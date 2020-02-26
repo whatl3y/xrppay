@@ -18,7 +18,6 @@
     "model": "node dist/tasks/database/model",
     "postinstall": "npm run build",
     "resqueRetry": "node dist/tasks/resque/retryFailedJobs",
-    "rippleListener": "node dist/bin/ripple_listener",
     "start": "pm2-runtime start ecosystem.config.js",
     "test": "NODE_ENV=test mocha --exit --require @babel/register --recursive './src/**/*.spec.js'",
     "worker": "node dist/bin/resque_worker"

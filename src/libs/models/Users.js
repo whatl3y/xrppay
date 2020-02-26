@@ -33,21 +33,7 @@ export default function Users(postgres, session=null) {
         'two_factor_last_entered',
         'two_factor_timeout_minutes',
         'is_disabled',
-        'phone_number',
-        'summary',
-        'experience',
-        'education',
-        'alert_prefs',
-
-        // Internal column that controls who can override PCI passing status
-        // for vulnerability items of customer's external scans. This should
-        // only be populated for internal users.
-        'is_asv_user',
-        'asv_cert_number',
-
-        // controls if nav items for unauthorized items show as grayed out
-        // or not at all
-        'show_unauthorized_modules'
+        'phone_number'
       ],
 
       // columns that should only be updated via the backend or an admin
@@ -66,8 +52,7 @@ export default function Users(postgres, session=null) {
         'two_factor_enabled',
         'two_factor_secret',
         'two_factor_last_entered',
-        'two_factor_timeout_minutes',
-        'asv_cert_number'
+        'two_factor_timeout_minutes'
       ],
 
       populateName(record) {

@@ -41,5 +41,14 @@ export default {
 
     const { session } = await ApiAuth.getSession()
     commit('SET_SESSION', session)
+  },
+
+  SOCKET_setUserWallet({ commit }, walletRecord) {
+    // window.toastr.success(`Your wallet balance was updated.`)
+    commit('SET_USER_WALLET', walletRecord)
+  },
+
+  SOCKET_setSpotPrice({ commit }, info) {
+    commit('SET_CRYPTO_EXCHANGE_PRICE', info)
   }
 }

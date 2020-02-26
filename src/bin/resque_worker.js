@@ -1,4 +1,4 @@
-import newrelic from 'newrelic'
+// import newrelic from 'newrelic'
 import minimist from 'minimist'
 // import throng from 'throng'
 import bunyan from 'bunyan'

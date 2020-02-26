@@ -10,22 +10,37 @@ const postgres = new PostgresClient()
 const argv = minimist(process.argv.slice(2))
 const sourceAddr = argv.a
 const sourcePriKey = argv.s
+const sourceTag = argv.st
 const xrpToSend = argv.x
+
+// provide userId or destination address
 const desintationUserId = argv.u
+const destinationAddr = argv.d
+const destinationTag = argv.t
 
 ;(async function sendXrp() {
   try {
-    if (!desintationUserId)
-      return console.log("Please specify a user to send currency to.")
+    if (!(desintationUserId || (destinationAddr && destinationTag)))
+      return console.log("Please specify a user or destination address to send XRP to.")
   
-    const wallets = CryptoWallet(postgres)
-    const wallet = await wallets.findBy({ user_id: desintationUserId, type: 'xrp' })
+    let wallet = null
+    if (desintationUserId) {
+      const wallets = CryptoWallet(postgres)
+      wallet = await wallets.findBy({ user_id: desintationUserId, type: 'xrp' })
+    } else {
+      wallet = {
+        mod2: destinationAddr,
+        mod1: destinationTag
+      }
+    }
+
     if (!wallet)
-      return console.log("No XRP wallet for user.")
+      return console.log("No destination XRP wallet available.")
 
     const res = await RippleClient().sendPayment(
       sourceAddr,
       sourcePriKey,
+      sourceTag ? parseInt(sourceTag) : undefined,
       wallet.mod2, // wallet.public_addr,
       parseInt(wallet.mod1),
       xrpToSend)

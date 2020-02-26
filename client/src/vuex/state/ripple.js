@@ -1,5 +1,5 @@
 export default {
   ripple: {
-    addresses: []
+    address: {}
   }
 }

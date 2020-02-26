@@ -14,6 +14,7 @@ import bunyan from 'bunyan'
 import WebSocket from '../websocket/index'
 import PostgresClient from '../libs/PostgresClient'
 import RedisHelper from '../libs/RedisHelper'
+import RippleAddrListener from '../libs/RippleAddrListener'
 import Routes from '../libs/Routes'
 import config from '../config'
 
@@ -140,6 +141,7 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         passport.deserializeUser((user, done) => done(null, user))
 
         WebSocket({ io, log, postgres, redis })
+        await RippleAddrListener({ io, log, postgres, redis }).listen()
 
         // Express error handling
         app.use(function ExpressErrorHandler(err, req, res, next) {

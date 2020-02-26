@@ -1,3 +1,4 @@
+import moment from 'moment'
 import Privacy from './privacy'
 import Ripple from './ripple'
 
@@ -15,5 +16,17 @@ export default {
 
   SET_SESSION(state, sessionObj) {
     state.session = sessionObj
+  },
+
+  SET_CRYPTO_EXCHANGE_PRICE(state, info) {
+    const [ type ] = Object.keys(info)
+    state.exchangePrices[type] = info[type]
+    state.exchangePricesLastUpdated = moment().toDate()
+  },
+
+  SET_USER_WALLET(state, walletRecords) {
+    Object.keys(walletRecords).forEach(type => {
+      state.wallets[type] = walletRecords[type]
+    })
   }
 }

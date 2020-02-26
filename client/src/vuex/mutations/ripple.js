@@ -1,5 +1,5 @@
 export default {
-  SET_RIPPLE_ADDRESSES(state, addr) {
-    state.ripple.addresses = addr
+  SET_RIPPLE_ADDRESS(state, addr) {
+    state.ripple.address = addr
   }
 }

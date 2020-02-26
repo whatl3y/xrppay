@@ -8,6 +8,7 @@ export default [
         password_hash varchar(255),
         first_name varchar(255),
         last_name varchar(255),
+        phone_number varchar(255),
         job_title varchar(255),
         avatar_file varchar(255),
         is_verified boolean,
@@ -24,6 +25,9 @@ export default [
         updated_at timestamptz NOT NULL DEFAULT now()
       );
     `)
+
+    await postgres.addColumnIfNotExists('users', 'two_factor_last_entered', 'timestamptz')
+    await postgres.addColumnIfNotExists('users', 'two_factor_timeout_minutes', 'bigint DEFAULT 10080') // default 7 days (60 * 24 * 7)
   },
 
   async function createUsersIndexes(postgres) {

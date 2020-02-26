@@ -31,13 +31,17 @@ testing vs. production readiness.
     - Make sure you [Enable API](https://privacy.com/account#api-key)
     - Populate the following environment variable with your Privacy API key
         - PRIVACY_API_KEY
-2. Create a new Ripple public/private key pair
+2. Create two new Ripple wallets (i.e. public/private key pair)
     - Create new address with `npm run generateXrpAddress`
+        1. The first address will be the primary address that users will send XRP to and the app will manage wallets of users with
+        2. The second address will be a cold address that the app will send XRP to when users spend money at merchants with their temp cards
     - Fund this account by sending at least 20 XRP to it from another address (either another private address or from an exchange)
     - Populate the following environment variables with the output from the script above
         - RIPPLE_X_ADDRESS
         - RIPPLE_CLASSIC_ADDR
         - RIPPLE_SECRET
+        - RIPPLE_COLD_X_ADDRESS
+        - RIPPLE_COLD_CLASSIC_ADDR
 
 ## Development
 

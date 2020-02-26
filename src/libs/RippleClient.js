@@ -50,15 +50,22 @@ export default function RippleClient(serverUrl=config.ripple.rippledUrl, options
       return await this.client.getLedger({ ledgerVersion: version })
     },
 
+    async getLedgerVersion() {
+      await this.connect()
+      return await this.client.getLedgerVersion()
+    },
+
     async sendPayment(
       sourceAddr,
       sourceAddrSecret,
+      sourceTag,
       targetAddr,
       targetTag,
       amountXrp
     ) {
       return await this.executeTransaction('Payment', sourceAddr, sourceAddrSecret, {
         "Amount": this.client.xrpToDrops(amountXrp.toString()),
+        "SourceTag": sourceTag,
         "Destination": targetAddr,
         "DestinationTag": targetTag
       })

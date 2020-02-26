@@ -1,8 +1,10 @@
 import request from 'request-promise-native'
 import App from "./App"
+import Crypto from "./Crypto"
 import Global from "./Global"
 import Privacy from "./Privacy"
 import Ripple from "./Ripple"
+import Wallets from "./Wallets"
 import SessionHandler from '../libs/SessionHandler'
 import { flatten } from '../libs/Helpers'
 import config from '../config'
@@ -27,9 +29,11 @@ export default async function WebSocket({ io, log, postgres, redis }) {
 
     const factoryArgs = { app, socket, log, io, postgres, redis }
     const handlers = {
+      crypto: Crypto(factoryArgs),
       global: Global(factoryArgs),
       privacy: Privacy(factoryArgs),
-      ripple: Ripple(factoryArgs)
+      ripple: Ripple(factoryArgs),
+      wallets: Wallets(factoryArgs)
     }
 
     Object.keys(handlers).forEach(category => {

@@ -8,5 +8,20 @@ export default {
   isLoading: true,
   isLoggedIn: false,
   
-  session: {}
+  session: {},
+
+  exchangePrices: {
+    btc: null,
+    eth: null,
+    xrp: null
+  },
+  exchangePricesLastUpdated: new Date(),
+
+  wallets: {
+    xrp: null
+  },
+
+  calculateAmountUsd(currencyCode, amountCurrency) {
+    return (this.exchangePrices[currencyCode] || 0) * amountCurrency
+  }
 }

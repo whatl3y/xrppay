@@ -15,32 +15,33 @@ export default function Privacy({ app, socket, log, io, postgres, redis }) {
       let card = await priv.findBy({ user_id: user.id, is_active: true })
 
       // initialize user's first card
-      if (!card) {
-        const cardRes = await PrivacyAPI(config.privacy.apiKey).createCard({
-          type: 'UNLOCKED',
-          memo: `${user.name || user.username_email}'s Card`,
-          spend_limit_duration: 'TRANSACTION',
-          state: 'PAUSED'
-        })
+      // TODO: Need to make sure the user has funded her account before creating a new card
+      // if (!card) {
+      //   const cardRes = await PrivacyAPI(config.privacy.apiKey).createCard({
+      //     type: 'SINGLE_USE',
+      //     memo: `${user.name || user.username_email}'s Card`,
+      //     spend_limit_duration: 'TRANSACTION',
+      //     state: 'PAUSED'
+      //   })
 
-        priv.setRecord({
-          user_id: user.id,
-          is_active: true,
-          friendly_name: cardRes.memo,
-          card_token: cardRes.token,
-          card_number: cardRes.pan,
-          cvv: cardRes.cvv,
-          exp_month: cardRes.exp_month,
-          exp_year: cardRes.exp_year,
-          type: cardRes.type,
-          state: cardRes.state,
-          spend_limit_duration: cardRes.spend_limit_duration,
-          spend_limit: cardRes.spend_limit
-        })
-        const id = await priv.save()
+      //   priv.setRecord({
+      //     user_id: user.id,
+      //     is_active: true,
+      //     friendly_name: cardRes.memo,
+      //     card_token: cardRes.token,
+      //     card_number: cardRes.pan,
+      //     cvv: cardRes.cvv,
+      //     exp_month: cardRes.exp_month,
+      //     exp_year: cardRes.exp_year,
+      //     type: cardRes.type,
+      //     state: cardRes.state,
+      //     spend_limit_duration: cardRes.spend_limit_duration,
+      //     spend_limit: cardRes.spend_limit
+      //   })
+      //   const id = await priv.save()
 
-        card = { ...priv.record, id }
-      }
+      //   card = { ...priv.record, id }
+      // }
 
       socket.emit(`getPrivacyActiveCard`, card)
     }

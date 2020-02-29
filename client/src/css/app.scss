@@ -63,3 +63,12 @@ label {
     height: calc(1.38845rem + 2px);
   }
 }
+
+.btn {
+  &.btn-vsm {
+    padding: .3286rem .675rem;
+    font-size: .5875rem;
+    line-height: 1.25;
+    border-radius: .25rem;
+  }
+}

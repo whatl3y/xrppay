@@ -41,6 +41,7 @@ export default {
 
   privacy: {
     apiKey: process.env.PRIVACY_API_KEY,
+    maxmimumPerTransaction: process.env.PRIVACY_CARD_MAX ? process.env.PRIVACY_CARD_MAX : '1000',
     serverUrl: process.env.NODE_ENV === 'production' ? 'https://sandbox.privacy.com/v1/' : 'https://api.privacy.com/v1/'
   },
 

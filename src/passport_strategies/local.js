@@ -1,9 +1,9 @@
 import PassportLocal from 'passport-local'
 import Users from '../libs/models/Users'
 import Errors from '../errors'
-// import BackgroundWorker from '../libs/BackgroundWorker'
+import BackgroundWorker from '../libs/BackgroundWorker'
 import LoginHandler from '../libs/LoginHandler'
-// import config from '../config'
+import config from '../config'
 
 const LocalStrategy = PassportLocal.Strategy
 
@@ -51,12 +51,8 @@ export default function LocalPassportStrategy({ log, postgres, redis }) {
           }
 
         } else {
-          // ----------------------------------------------------------------
-          // TODO: 2019-02-06: Right now we don't want someone without
-          // a user record to sign up without being invited.
           if (!createNewUser)
             throw new Errors.NoEmailAddress('No email address found for this user.')
-          // ----------------------------------------------------------------
 
           // Confirm username is valid e-mail address
           // if(!Utilities.Regexp.email.test(username))
@@ -72,16 +68,11 @@ export default function LocalPassportStrategy({ log, postgres, redis }) {
             verification_code: users.generateVerificationCode()
           }, true)
 
-          // Only send the verification mailer if createNewUser is not set since
-          // we will include the verification link together with temp password
-          // e-mail that is sent in the `invite` endpoint
-          if (!createNewUser) {
-            await BackgroundWorker({ redis }).enqueue('sendVerificationMailer', {
-              title: 'Welcome to xrppay!',
-              userEmail: username,
-              verificationCode: users.record.verification_code
-            }, config.resque.mailer_queue)
-          }
+          await BackgroundWorker({ redis }).enqueue('sendVerificationMailer', {
+            title: 'Welcome to xrppay!',
+            userEmail: username,
+            verificationCode: users.record.verification_code
+          }, config.resque.mailer_queue)
         }
 
         users.setRecord({
@@ -90,7 +81,7 @@ export default function LocalPassportStrategy({ log, postgres, redis }) {
           last_session_refresh: lastLogin,
           num_logins: (userRecord.num_logins || 0) + 1
         }, true)
-        const userId = await users.save()
+        await users.save()
 
         await login.standardLogin({ ...userRecord, ...users.record })
         return done(null, username)

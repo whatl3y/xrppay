@@ -1,4 +1,6 @@
+import BigNumber from 'bignumber.js'
 import DatabaseModel from './DatabaseModel'
+import CryptoWallet from './CryptoWallet'
 import RippleClient from '../RippleClient'
 import config from '../../config'
 
@@ -90,6 +92,27 @@ export default function XrplTransactions(postgres) {
         })
         await trans.save()
         return trans.record
+      },
+
+      async refreshUserWallet(userId) {
+        const ripple = RippleClient()
+        const { credits, debits } = await this.getTransactionsForUser(userId)
+        const updatedWallet = await CryptoWallet(postgres).resetBalancefromAllDebitsAndCredits(userId, 'xrp', [
+          ...credits.map(txn => {
+            return {
+              debitOrCredit: 'credit',
+              amountAbsValue: ripple.client.dropsToXrp(txn.amount_drops)
+            }
+          }),
+          ...debits.map(txn => {
+            const changeAmountDrops = new BigNumber(txn.amount_drops || 0).plus(txn.fee_drops || 0)
+            return {
+              debitOrCredit: 'debit',
+              amountAbsValue: ripple.client.dropsToXrp(changeAmountDrops.toString())
+            }
+          })
+        ])
+        return updatedWallet
       }
     }
   )

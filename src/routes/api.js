@@ -1,6 +1,6 @@
 import Api from './api/index.js'
 
-export default function({ log, postgres, redis }) {
+export default function(options) {
   return {
     priority: 0,
     verb: 'ALL',
@@ -11,7 +11,7 @@ export default function({ log, postgres, redis }) {
         const namespace = req.params.namespace
         const path = req.params[0]
 
-        const namespacedRoutes = Api[version][namespace]({ log, postgres, redis })
+        const namespacedRoutes = Api[version][namespace](options)
         return await namespacedRoutes[path](req, res)
 
       } catch(err) {

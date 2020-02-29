@@ -1,18 +1,25 @@
 <template lang="pug">
   div.row
     div.col-lg-8.offset-lg-2.my-4
-      div.card
+      div.card.border-0
         div.card-body
           div.d-flex.align-items-start
             div
-              div Wallet Balance: #[i#refresh-wallet.clickable.fa.fa-sync-alt(@click="refreshWallet")]
-              div.text-large {{ (userXrpWallet.current_amount || 0).toFixed(4) }} XRP ≈ ${{ currentAmountUsd }} USD
+              div
+                | Wallet Balance:
+                | #[i#refresh-wallet.clickable.fa.fa-sync-alt(@click="refreshWallet")]
+                | #[i#send-ripple-button.ml-1.clickable.fa.fa-share(v-if="userXrpWalletCurrentAmount > 1",data-toggle="modal",data-target="#send-xrp-modal")]
+              div.text-large {{ userXrpWalletCurrentAmount }} XRP ≈ ${{ currentAmountUsd }} USD
 
               b-tooltip(target="refresh-wallet",placement="rightbottom")
                 | Is your wallet missing a credit or debit you expect to see? We have background workers
                 | running constantly to ensure the integrity and accuracy of all balances,
                 | but you can force an off-schedule automated review of your wallet balance by
                 | clicking here.
+
+              b-tooltip(target="send-ripple-button",placement="rightbottom")
+                | If you want to send any amount in your wallet to another address,
+                | click here to designate the destination and amount to send.
             div.ml-auto.text-right.small
               div #[i#exchange-rate-info.fa.fa-info-circle] Exchange Rate
               div 1 XRP ≈ ${{ xrpExchangePrice || 'N/A' }} USD
@@ -44,7 +51,7 @@
                     div
                       code.p-1 {{ xrpAddress.mod1 }}
         
-        div.card-header
+        div.card-header.border-top
           h4.m-0 2. Use Card Info at Merchant
         div.card-body
           div(v-if="!privacyCard")
@@ -53,11 +60,34 @@
               | account we will automatically create a card for you to use at
               | your merchant of choice.
           div.row.small-gutters(v-else)
-            div.col-lg-12
+            div.col-lg-6
               div.form-group
                 label Card #
                 div.text-large
                   strong {{ cardNumber }}
+            div.col-lg-6
+              div.card
+                div.card-body.py-2
+                  div.row.small-gutters
+                    div.col
+                      div.form-group.m-0
+                        label State
+                        div
+                          strong {{ privacyCard.state }}
+                    div.col
+                      div.form-group.m-0
+                        label Spend Limit
+                        div
+                          strong ${{ privacyCard.spend_limit }}
+                    div.col.d-flex.align-items-center.justify-content-end
+                      button#lock-privacy-card.btn.btn-vsm.btn-primary Lock #[i.fa.fa-info-circle]
+                      b-tooltip(target="lock-privacy-card",placement="right")
+                        | Locking your card temporarily adds funds to your card you can spend at
+                        | your merchant of choice (up to a maximum of ${{ maxTransaction }}). We calculate the
+                        | exchange rate of your cryptocurrency wallet at the time you lock the card
+                        | to add funds to it, and the card is active for up to 10 minutes. After 10
+                        | minutes if you don't use your card, it will be paused again and you'll have to 
+                        | re-lock at the latest exchange rate.
             div.col-lg-4
               div.form-group
                 label Exp Month
@@ -73,9 +103,12 @@
                 label CVV
                 div.text-large
                   strong {{ privacyCard.cvv }}
+
+    send-xrp-modal#send-xrp-modal(v-if="userXrpWalletCurrentAmount > 1")
 </template>
 
 <script>
+  import BigNumber from 'bignumber.js'
   import { mapState } from 'vuex'
   import moment from 'moment'
 
@@ -93,11 +126,16 @@
         xrpExchangePrice: state => state.exchangePrices.xrp,
         exchangeUpdated: state => moment(state.exchangePricesLastUpdated).format('h:mm:ss a'),
         userXrpWallet: state => state.wallets.xrp || {},
+        maxTransaction: state => state.privacy.maxPerTransaction,
 
         currentAmountUsd(state) {
-          return state.calculateAmountUsd('xrp', this.userXrpWallet.current_amount || 0).toFixed(2)
+          return new BigNumber(state.calculateAmountUsd('xrp', this.userXrpWallet.current_amount || 0)).toFixed(2)
         }
       }),
+
+      userXrpWalletCurrentAmount() {
+        return new BigNumber(this.userXrpWallet.current_amount || 0).toFixed(2)
+      },
 
       cardNumber() {
         return ((this.privacyCard.card_number || '').match(/\d{4}/g) || []).join(' ')
@@ -115,9 +153,10 @@
       this.spotPriceInterval = setInterval(() => this.$socket.emit('getSpotPrice', { type: 'XRP' }), 10000)
 
       this.$socket.emit('getSpotPrice', { type: 'XRP' })
-      this.$socket.emit('walletGetUserWallets')
-      this.$socket.emit('rippleGetAddress')
       this.$socket.emit('privacyGetActiveCard')
+      this.$socket.emit('rippleGetAddress')
+      this.$socket.emit('walletGetUserWallets')
+      this.$socket.emit('getMaximumSpendPerTransaction')
     },
     
     beforeDestroy() {

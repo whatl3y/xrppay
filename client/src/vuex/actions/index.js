@@ -14,20 +14,22 @@ export default {
     commit('CHECK_LOGGED_IN', isLoggedIn)
     if (isLoggedIn) {
       if (!state.session.user.is_verified) {
-        if (!/^\/verification\//.test(fullPath))
-          return state.router.push('/verification/pending')
+        if (!/^\/verification\//.test(fullPath)) {
+          state.router.push('/verification/pending')
+          return commit('APP_NO_LONGER_LOADING')
+        }
       } else {
         // Uses window.location.href redirect in order to intiate all init
         // actions again since vueRouter.push will not call init actions
         if (/^\/login/.test(fullPath)) {
-          // TODO make call to set redirect route
-          // await ApiGlobal.setRedirectUrl(window.location.pathname)
           return window.location.href = '/' // return state.router.push('/')
         }
       }
     } else {
-      if (!(/^\/login/.test(fullPath) || /^\/autherror/.test(fullPath) || /^\/mfa/.test(fullPath)))
-        return state.router.push('/login')
+      if (!(/^\/login/.test(fullPath) || /^\/autherror/.test(fullPath) || /^\/mfa/.test(fullPath))) {
+        state.router.push('/login')
+        return commit('APP_NO_LONGER_LOADING')
+      }
 
       return commit('APP_NO_LONGER_LOADING')
     }

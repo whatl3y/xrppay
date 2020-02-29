@@ -3,7 +3,8 @@
     div.main-navbar.sticky-top.bg-white.border-bottom.row
       app-top-navbar.w-100
     div.container
-      router-view#main-content
+      loader(v-if="isLoading")
+      router-view#main-content(v-else)
 
     reset-password-modal(@reset="resetSession")
 </template>
@@ -19,6 +20,7 @@
     name: 'xrppay',
 
     computed: mapState({
+      isLoading: state => state.isLoading,
       user: state => state.session.user
     }),
 
@@ -35,11 +37,6 @@
     },
 
     async created() {
-      // XrppaySocket.on('connect', () =>  this.subscribeXrppaySocket())
-      // XrppaySocket.on('connect_error', console.error)
-      // XrppaySocket.on('error', console.error)
-      // XrppaySocket.on('disconnect', () => XrppaySocket.open())
-      
       await this.$store.dispatch('init')
 
       if (this.user && this.user.needs_password_reset)

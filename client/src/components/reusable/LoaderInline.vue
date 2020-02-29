@@ -1,5 +1,5 @@
 <template lang="pug">
-  i.fal.fa-spinner.fa-spin(:class="getSizeClass()")
+  i.fa.fa-spinner.fa-spin(:class="getSizeClass()")
 </template>
 
 <script>

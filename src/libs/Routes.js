@@ -5,7 +5,7 @@ import config from '../config'
 
 const readDir = util.promisify(fs.readdir)
 
-export default function Routes({ postgres, redis, log }) {
+export default function Routes(options) {
   return {
     _path: path.join(__dirname, '..', 'routes'),
 
@@ -13,7 +13,7 @@ export default function Routes({ postgres, redis, log }) {
       const files       = await readDir(this._path)
       const routeFiles  = files.filter(file => fs.lstatSync(path.join(this._path, file)).isFile()).filter(file => !/\.spec\.js$/.test(file))
       const routes = routeFiles.map(file => {
-        const routeInfo = require(path.join(this._path, file)).default({ postgres, redis, log })
+        const routeInfo = require(path.join(this._path, file)).default(options)
         return {
           verb: routeInfo.verb,
           path: routeInfo.route,

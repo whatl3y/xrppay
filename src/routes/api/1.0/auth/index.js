@@ -1,12 +1,37 @@
 import BackgroundWorker from '../../../../libs/BackgroundWorker'
 import SessionHandler from '../../../../libs/SessionHandler'
 import Users from '../../../../libs/models/Users'
+import LocalStrategy from '../../../../passport_strategies/local'
 import config from '../../../../config'
 
-export default function({ postgres, redis }) {
+export default function({ log, postgres, redis }) {
   return {
     session(req, res) {
       res.json({ session: req.session })
+    },
+
+    async ['create/user'](req, res) {
+      try {
+        const username = req.body.username
+        const password = req.body.password
+        const confPass = req.body.cpassword
+        
+        if (!password || password !== confPass)
+          return res.redirect('/login?password_confirm')
+
+        await LocalStrategy({ log, postgres, redis }).handler(
+          req,
+          username,
+          password,
+          () => {},
+          true)
+
+        res.redirect('/')
+
+      } catch(err) {
+        log.error(`Error creating new user`, err)
+        res.redirect(err.redirectRoute || '/')
+      }
     },
 
     async ['password/forgot'](req, res) {

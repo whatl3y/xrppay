@@ -9,11 +9,10 @@ export default function Ripple({ app, socket, log, io, postgres, redis }) {
 
   return {
     async rippleGetAddress() {
-      // const ripple = RippleClient()
       const wallet = CryptoWallet(postgres)
       const userId = session.getLoggedInUserId()
-      let userWallet = await wallet.findBy({ user_id: userId, type: 'xrp' })
-      if (!userWallet) {
+      let userWallet = await wallet.findOrCreateBy({ user_id: userId, type: 'xrp' })
+      if (wallet.isNewRecord) {
         wallet.setRecord({
           user_id: userId,
           type: 'xrp',
@@ -23,7 +22,7 @@ export default function Ripple({ app, socket, log, io, postgres, redis }) {
           mod2: config.ripple.masterClassicAddr // classic XRP address
         })
         await wallet.save()
-        userWallet = await wallet.findBy({ user_id: userId, type: 'xrp' })
+        userWallet = wallet.record
       }
 
       socket.emit(`setRippleAddress`, userWallet)

@@ -1,5 +1,6 @@
 export default {
   privacy: {
-    card: null
+    card: null,
+    maxPerTransaction: '0'
   }
 }

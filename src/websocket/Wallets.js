@@ -1,6 +1,8 @@
-import RippleClient from '../libs/RippleClient'
+import BigNumber from 'bignumber.js'
+// import RippleClient from '../libs/RippleClient'
 import SessionHandler from '../libs/SessionHandler'
-import UserWallets from '../libs/models/UserWallets'
+import CryptoWallet from '../libs/models/CryptoWallet'
+import PrivacyCards from '../libs/models/PrivacyCards'
 import XrplTransactions from '../libs/models/XrplTransactions'
 import { arrayGroupBy } from '../libs/Helpers'
 // import config from '../config'
@@ -8,29 +10,33 @@ import { arrayGroupBy } from '../libs/Helpers'
 export default function Wallets({ app, socket, log, io, postgres, redis }) {
   const req = socket.request
   const session = SessionHandler(req.session, { redis })
-  const userId = session.getLoggedInUserId()
+  const user = session.getLoggedInUserId(true)
 
   return {
     async refreshUserWallet(walletType) {
       // TODO: need to abstract this and support more wallet types in the future
       if (walletType === 'xrp') {
-        const ripple = RippleClient()
-        const { credits, debits } = await XrplTransactions(postgres).getTransactionsForUser(userId)
-        const updatedWallet = await UserWallets(postgres).resetBalancefromAllDebitsAndCredits(userId, walletType, [
-          ...credits.map(txn => ({ debitOrCredit: 'credit', amountAbsValue: ripple.client.dropsToXrp(txn.amount_drops) })),
-          ...debits.map(txn => ({ debitOrCredit: 'debit', amountAbsValue: ripple.client.dropsToXrp((parseFloat(txn.amount_drops || 0) + parseFloat(txn.fee_drops || 0)).toString()) }))
-        ])
-
+        const updatedWallet = await XrplTransactions(postgres).refreshUserWallet(user.id)
         socket.emit('setUserWallet', { xrp: updatedWallet })
+
+        const currentAmount = new BigNumber(updatedWallet.current_amount)
+        if (currentAmount.isGreaterThanOrEqualTo(1)) {
+          const priv = PrivacyCards(postgres)
+          let card = await priv.findBy({ user_id: user.id, is_active: true })
+          if (!card) {
+            card = await priv.createCard(user)
+            socket.emit(`getPrivacyActiveCard`, card)
+          }
+        }
       }
     },
 
     async walletGetUserWallets() {
-      const wallets = UserWallets(postgres)
-      let userWallets = await wallets.getAllBy({ user_id: userId })
+      const wallets = CryptoWallet(postgres)
+      let userWallets = await wallets.getAllBy({ user_id: user.id })
       if (userWallets.length === 0) {
-        await wallets.findOrCreateBy({ user_id: userId, type: 'xrp' })
-        userWallets = await wallets.getAllBy({ user_id: userId })
+        await wallets.findOrCreateBy({ user_id: user.id, type: 'xrp' })
+        userWallets = await wallets.getAllBy({ user_id: user.id })
       }
 
       const walletsByType = arrayGroupBy(userWallets, w => w.type)

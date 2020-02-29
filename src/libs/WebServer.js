@@ -32,7 +32,7 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
     httpServer,
     async function startServer() {
       try {
-        const routeInst = Routes({ postgres, redis, log })
+        const routeInst = Routes({ io, log, postgres, redis })
         const routes = await routeInst.get()
         const isActuallyProductionHost = config.server.isProduction && config.server.host.indexOf('https') === 0
 
@@ -146,6 +146,11 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         // Express error handling
         app.use(function ExpressErrorHandler(err, req, res, next) {
           log.error('Express error handling', err)
+
+          const contType = req.headers['content-type']
+          if (contType && contType === 'application/json')
+            return res.status(500).json({ error: `There was an error that we're looking into now. Thanks for your patience.` })
+
           res.redirect(err.redirectRoute || '/')
         })
 

@@ -79,7 +79,7 @@ export default function RippleClient(serverUrl=config.ripple.rippledUrl, options
     ) {
       await this.connect()
       const [ feeXrp, currLedger ] = await Promise.all([
-        this.client.getFee(),
+        this.getFee(),
         this.client.getLedgerVersion()
       ])
 
@@ -142,6 +142,11 @@ export default function RippleClient(serverUrl=config.ripple.rippledUrl, options
         streams: [ 'transactions' ]
       })
       return res
+    },
+
+    async getFee() {
+      await this.client.connect()
+      return await this.client.getFee()
     },
 
     generateAddress(options={}) {

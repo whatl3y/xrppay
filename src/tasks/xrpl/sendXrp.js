@@ -1,10 +1,8 @@
-require('dotenv').config()
-
 import minimist from 'minimist'
 import RippleClient from '../../libs/RippleClient'
 import PostgresClient from '../../libs/PostgresClient'
 import CryptoWallet from '../../libs/models/CryptoWallet'
-// import config from '../../config'
+import config from '../../config'
 
 const postgres = new PostgresClient()
 const argv = minimist(process.argv.slice(2))

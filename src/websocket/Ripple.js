@@ -12,7 +12,7 @@ export default function Ripple({ app, socket, log, io, postgres, redis }) {
       const wallet = CryptoWallet(postgres)
       const userId = session.getLoggedInUserId()
       let userWallet = await wallet.findOrCreateBy({ user_id: userId, type: 'xrp' })
-      if (wallet.isNewRecord) {
+      if (wallet.isNewRecord || !userWallet.public_addr) {
         wallet.setRecord({
           user_id: userId,
           type: 'xrp',

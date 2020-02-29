@@ -1,8 +1,6 @@
-require('dotenv').config()
-
 // import minimist from 'minimist'
 import RippleClient from '../../libs/RippleClient'
-// import config from '../../config'
+import config from '../../config'
 
 // const argv = minimist(process.argv.slice(2))
 // const version = argv.v

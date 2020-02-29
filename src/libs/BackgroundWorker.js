@@ -18,6 +18,16 @@ export default function BackgroundWorker({ redis }) {
       await this.backgroundWorkerQueue.enqueue(queue, job, [options])
     },
 
+    async enqueueIn(
+      milliseconds,
+      job,
+      options={},
+      queue=config.resque.default_queue
+    ) {
+      await this.connect()
+      await this.backgroundWorkerQueue.enqueueIn(milliseconds, queue, job, [options])
+    },
+
     async connect() {
       if (this.isConnected)
         return

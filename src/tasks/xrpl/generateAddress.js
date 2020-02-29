@@ -1,7 +1,5 @@
-require('dotenv').config()
-
 import RippleClient from '../../libs/RippleClient'
-// import config from '../../config'
+import config from '../../config'
 
 ;(function generateAddress() {
   try {

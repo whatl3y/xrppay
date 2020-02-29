@@ -20,10 +20,12 @@ export default function Privacy({ app, socket, log, io, postgres, redis }) {
 
       let [
         card,
-        wallet
+        wallet,
+        activeExpiration
       ] = await Promise.all([
         priv.findBy({ user_id: user.id, is_active: true }),
-        wallets.findBy({ user_id: user.id, type: 'xrp' })
+        wallets.findBy({ user_id: user.id, type: 'xrp' }),
+        redis.client.ttl(`burner_card_expiration_key_${user.id}`)
       ])
       const currentAmount = wallet && new BigNumber(wallet.current_amount)
 
@@ -32,6 +34,7 @@ export default function Privacy({ app, socket, log, io, postgres, redis }) {
         card = await priv.createCard(user)
 
       socket.emit(`getPrivacyActiveCard`, card)
+      socket.emit('privacyActiveCardExpiration', activeExpiration)
     }
   }
 }

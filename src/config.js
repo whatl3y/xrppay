@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 import path from 'path'
 import createCWStream from 'bunyan-cloudwatch'
 
@@ -6,6 +8,8 @@ const hostName = process.env.HOSTNAME || "http://localhost:8080"
 
 export default {
   apiKeyHeader: 'x-xrppay-key',
+
+  percentPerTransaction: process.env.PERCENT_TAKE || '0.95',
 
   app: {
     name: appName,

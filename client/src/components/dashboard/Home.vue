@@ -78,9 +78,9 @@
                       div.form-group.m-0
                         label Spend Limit
                         div
-                          strong ${{ privacyCard.spend_limit }}
+                          strong ${{ privacyCardLimitUsd }}
                     div.col.d-flex.align-items-center.justify-content-end
-                      button#lock-privacy-card.btn.btn-vsm.btn-primary Lock #[i.fa.fa-info-circle]
+                      button#lock-privacy-card.btn.btn-vsm.btn-primary(v-if="privacyCard.state !== 'OPEN'",@click="lockCard") Lock #[i.fa.fa-info-circle]
                       b-tooltip(target="lock-privacy-card",placement="right")
                         | Locking your card temporarily adds funds to your card you can spend at
                         | your merchant of choice (up to a maximum of ${{ maxTransaction }}). We calculate the
@@ -111,6 +111,7 @@
   import BigNumber from 'bignumber.js'
   import { mapState } from 'vuex'
   import moment from 'moment'
+  import ApiPrivacy from '../../factories/ApiPrivacy'
 
   export default {
     data() {
@@ -127,6 +128,7 @@
         exchangeUpdated: state => moment(state.exchangePricesLastUpdated).format('h:mm:ss a'),
         userXrpWallet: state => state.wallets.xrp || {},
         maxTransaction: state => state.privacy.maxPerTransaction,
+        privacyCardLimitUsd: (_, getters) => getters.getPrivacyCardLimitUsd,
 
         currentAmountUsd(state) {
           return new BigNumber(state.calculateAmountUsd('xrp', this.userXrpWallet.current_amount || 0)).toFixed(2)
@@ -143,6 +145,15 @@
     },
 
     methods: {
+      async lockCard() {
+        try {
+          await ApiPrivacy.lockBurnerCard()
+          window.toastr.success(`Successfully updated your card! Your spend limit is updated, please use your card within 10 minutes or you will have to relock it later.`)
+        } catch(err) {
+          window.toastr.error(err.message)
+        }
+      },
+
       refreshWallet() {
         this.$socket.emit('refreshUserWallet', 'xrp')
         window.toastr.success(`Sit tight, we're ensuring your wallet balance is correct now!`)

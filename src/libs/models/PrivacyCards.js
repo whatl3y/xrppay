@@ -38,19 +38,43 @@ export default function PrivacyCards(postgres) {
           state: state || 'PAUSED'
         })
 
+        return await this.updateCardRecordFromPrivacyResponse(user.id, cardRes)
+      },
+
+      async updateCard(userId, {
+        state,
+        limit
+      }) {
+        const userCard = await this.findBy({ user_id: userId, is_active: true })
+        const cardRes = await PrivacyAPI(config.privacy.apiKey).updateCard({
+          card_token: userCard.card_token,
+          state: state || 'OPEN',
+          spend_limit: limit || 0 // NOTE: limit is in cents
+        })
+        return await this.updateCardRecordFromPrivacyResponse(userId, cardRes, userCard.id)
+      },
+
+      async updateCardRecordFromPrivacyResponse(userId, cardRes, cardId=null) {
+        if (cardId) {
+          const card = await this.findBy({ user_id: userId, id: cardId })
+          if (!card)
+            throw new Error(`No card with the ID provided.`)
+          this.setRecord(card)
+        }
+
         this.setRecord({
-          user_id: user.id,
+          user_id: userId,
           is_active: true,
-          friendly_name: cardRes.memo,
-          card_token: cardRes.token,
-          card_number: cardRes.pan,
-          cvv: cardRes.cvv,
-          exp_month: cardRes.exp_month,
-          exp_year: cardRes.exp_year,
-          type: cardRes.type,
-          state: cardRes.state,
-          spend_limit_duration: cardRes.spend_limit_duration,
-          spend_limit: cardRes.spend_limit
+          friendly_name: cardRes.memo || this.record.friendly_name,
+          card_token: cardRes.token || this.record.card_token,
+          card_number: cardRes.pan || this.record.card_number,
+          cvv: cardRes.cvv || this.record.cvv,
+          exp_month: cardRes.exp_month || this.record.exp_month,
+          exp_year: cardRes.exp_year || this.record.exp_year,
+          type: cardRes.type || this.record.type,
+          state: cardRes.state || this.record.state,
+          spend_limit_duration: cardRes.spend_limit_duration || this.record.spend_limit_duration,
+          spend_limit: cardRes.spend_limit || this.record.spend_limit
         })
         const id = await this.save()
         return { ...this.record, id }

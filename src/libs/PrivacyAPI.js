@@ -59,6 +59,18 @@ export default function PrivacyAPI(apiKey, serverUrl='https://sandbox.privacy.co
       return dataAdded
     },
 
+    async simulateAuthorization(cardNum, merchant, amountUsd) {
+      return await this.client.post({
+        url: '/simulate/authorize',
+        body: {
+          descriptor: merchant,
+          pan: cardNum,
+          amount: amountUsd
+        },
+        json: true
+      })
+    },
+
     generateHmac(apiKey, txnObj) {
       const hmac = crypto.createHmac('sha256', apiKey)
       const base64Txn = Buffer.from(txnObj).toString('base64')

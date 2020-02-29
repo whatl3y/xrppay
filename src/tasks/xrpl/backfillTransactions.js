@@ -1,10 +1,8 @@
-require('dotenv').config()
-
 import minimist from 'minimist'
 import PostgresClient from '../../libs/PostgresClient'
 import RippleClient from '../../libs/RippleClient'
 import XrplTransactions from '../../libs/models/XrplTransactions'
-// import config from '../../config'
+import config from '../../config'
 
 const argv = minimist(process.argv.slice(2))
 const howManyLedgersAgo = parseInt(argv.n|| 1e4)
@@ -21,7 +19,7 @@ const postgres = new PostgresClient()
     let current = latestLedgerToCheck - howManyLedgersAgo
     while (current < latestLedgerToCheck) {
       const localLatestLedger = current + span
-      const transactions = await ripple.getTransactions(process.env.RIPPLE_X_ADDRESS, {
+      const transactions = await ripple.getTransactions(config.ripple.masterAddr, {
         minLedgerVersion: current,
         maxLedgerVersion: localLatestLedger
       })
@@ -37,7 +35,7 @@ const postgres = new PostgresClient()
       current += span
     }
 
-    console.log("Successfully backfilled all transactions for address:", process.env.RIPPLE_X_ADDRESS)
+    console.log("Successfully backfilled all transactions for address:", config.ripple.masterAddr)
 
   } catch(err) {
     console.error(`Error backfilling transactions`, err)

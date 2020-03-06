@@ -22,11 +22,12 @@ export default function({ io, log, postgres, redis }) {
           return res.status(400).json({ error: `Make sure you include a destination address, tag, and amount of XRP to send.` })
 
         const xrpWallet = await wallets.findOrCreateBy({ user_id: user.id, type: 'xrp' })
+        const amountToSend = new BigNumber(amount)
         const currentAmount = new BigNumber(xrpWallet.current_amount)
         if (!xrpWallet || currentAmount.isLessThanOrEqualTo(1))
           return res.status(400).json({ error: `You need at least 1 XRP in your wallet to send to another address.` })
 
-        if (currentAmount.isLessThan(amount))
+        if (currentAmount.isLessThan(amountToSend))
           return res.status(400).json({ error: `You are trying to send more XRP than is in your wallet. Please specify an amount up to your wallet amount.` })
 
         const info = await ripple.sendPayment(
@@ -35,7 +36,7 @@ export default function({ io, log, postgres, redis }) {
           new BigNumber(xrpWallet.mod1).toNumber(),
           addr,
           new BigNumber(tag).toNumber(),
-          amount.toFixed(5))
+          amountToSend.toFixed(5))
 
         const txn = info.result.tx_json
         const subtractAmount = new BigNumber(txn.Amount).plus(txn.Fee)

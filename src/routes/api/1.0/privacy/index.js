@@ -88,9 +88,11 @@ export default function({ io, log, postgres, redis }) {
       const amountUsdToAddToCard = currentAmountInWallet
         .times(amountDollarsPerCurrency)
         .times(config.percentPerTransaction)
-      const amountUsdCents = parseInt(amountUsdToAddToCard.times(100).integerValue(BigNumber.ROUND_DOWN))
+      const amountUsdCents = amountUsdToAddToCard.times(100)
+      const amountMaxPerTxnCents = new BigNumber(config.privacy.maxmimumPerTransaction).times(100)
+      const finalAmountUsdCents = BigNumber.minimum(amountUsdCents, amountMaxPerTxnCents).integerValue(BigNumber.ROUND_DOWN)
 
-      const newCardInfo = await PrivacyCards(postgres).updateCard(userId, { limit: amountUsdCents })
+      const newCardInfo = await PrivacyCards(postgres).updateCard(userId, { limit: finalAmountUsdCents.toNumber() })
       await Promise.all([
         BackgroundWorker({ redis }).enqueueIn(10 * 60 * 1e3, 'privacyLockCard', { userId }),
         redis.client.set(

@@ -24,7 +24,7 @@ export default function({ io, log, postgres, redis }) {
       const transactionObject = req.body
 
       const generatedHmac = privacy.generateHmac(stringify(transactionObject))
-      if (!crypto.timingSafeEqual(Buffer.from(generatedHmac), Buffer.from(privacyHmacToken))) {
+      if (!crypto.timingSafeEqual(Buffer.from(generatedHmac, 'base64'), Buffer.from(privacyHmacToken, 'base64'))) {
         log.error(`HMAC token from Privacy transaction doesn't match`, privacyHmacToken, generatedHmac, req.body)
         return res.sendStatus(400)
       }
@@ -56,10 +56,7 @@ export default function({ io, log, postgres, redis }) {
         spend_limit: transactionObject.card.spend_limit
       })
 
-      await Promise.all([
-        txnInst.save(),
-        cards.save()
-      ])
+      await txnInst.save()
 
       // If the transaction record is a new one,
       // send money from user's wallet to cold wallet
@@ -68,6 +65,12 @@ export default function({ io, log, postgres, redis }) {
 
       const rippleRes = await CryptoWallet(postgres).processTransaction(card.user_id, transactionObject)
       log.info(`Response from sending XRP to cold wallet`, rippleRes)
+
+      // Save the card info last so we don't prematurely deactivate
+      // it before sending XRP to our cold wallet (i.e. allowing
+      // the user to potentially spend their wallet balance more
+      // than once)
+      await cards.save()
 
       io.in(`user_${card.user_id}`).emit('refresh')
       res.json(true)

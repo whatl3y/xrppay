@@ -20,7 +20,7 @@
     "resqueRetry": "node dist/tasks/resque/retryFailedJobs",
     "scheduler": "node dist/bin/resqueScheduler",
     "start": "pm2-runtime start ecosystem.config.js",
-    "test": "NODE_ENV=test mocha --exit --require @babel/register --recursive './src/**/*.spec.js' --grep jsonStringifyAndSortKeys",
+    "test": "NODE_ENV=test mocha --exit --require @babel/register --recursive './src/**/*.spec.js'",
     "worker": "node dist/bin/resqueWorker"
   },
   "devDependencies": {

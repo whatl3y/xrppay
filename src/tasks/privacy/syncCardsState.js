@@ -55,10 +55,7 @@ const redis = new RedisHelper()
         spend_limit: txn.card.spend_limit
       })
 
-      await Promise.all([
-        locTxn.save(),
-        cards.save()
-      ])
+      await locTxn.save()
 
       // If the transaction record is a new one,
       // send money from user's wallet to cold wallet
@@ -69,6 +66,13 @@ const redis = new RedisHelper()
       console.log(`Response from sending XRP to cold wallet`, rippleRes)
 
       // TODO: Refresh affected users wallet balance
+
+      
+      // Save the card info last so we don't prematurely deactivate
+      // it before sending XRP to our cold wallet (i.e. allowing
+      // the user to potentially spend their wallet balance more
+      // than once)
+      cards.save()
     }
 
     await redis.client.set(lastSyncKey, moment().subtract(1, 'day').format('YYYY-MM-DD'), 'EX', 60 * 60)

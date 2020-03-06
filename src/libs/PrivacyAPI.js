@@ -71,8 +71,7 @@ export default function PrivacyAPI(apiKey, serverUrl='https://sandbox.privacy.co
       })
     },
 
-    generateHmac(txnObj, key=apiKey) {
-      const txnJson  = txnObj.toString() === '[object Object]' ? JSON.stringify(txnObj) : txnObj
+    generateHmac(txnJson, key=apiKey) {
       const hmac = crypto.createHmac('sha256', key)
       const base64Txn = Buffer.from(txnJson).toString('base64')
       hmac.update(base64Txn, 'utf8')

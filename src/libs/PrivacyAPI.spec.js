@@ -7,7 +7,7 @@ describe('PrivacyAPI', function() {
 
   describe('#generateHmac', function() {
     it('generate an HMAC token from the provided object', function() {
-      const token = privacy.generateHmac({ lance: 1 })
+      const token = privacy.generateHmac(JSON.stringify({ lance: 1 }))
       assert.equal('string', typeof token)
     })
   })

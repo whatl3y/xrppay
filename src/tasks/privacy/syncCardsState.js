@@ -59,7 +59,7 @@ const redis = new RedisHelper()
 
       // If the transaction record is a new one,
       // send money from user's wallet to cold wallet
-      if (!locTxn.isNewRecord)
+      if (!locTxn.isNewRecord || locTxn.record.result !== 'APPROVED')
         continue
 
       const rippleRes = await CryptoWallet(postgres).processTransaction(card.user_id, txn)

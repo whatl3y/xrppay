@@ -9,7 +9,10 @@ const hostName = process.env.HOSTNAME || "http://localhost:8080"
 export default {
   apiKeyHeader: 'x-xrppay-key',
 
-  percentPerTransaction: process.env.PERCENT_TAKE || '0.95',
+  systemConfig: {
+    maxmimumPerTransaction: process.env.PRIVACY_CARD_MAX ? process.env.PRIVACY_CARD_MAX : '1000',
+    percentPerTransaction: process.env.PERCENT_TAKE || '0.95',
+  },
 
   app: {
     name: appName,
@@ -45,7 +48,6 @@ export default {
 
   privacy: {
     apiKey: process.env.PRIVACY_API_KEY,
-    maxmimumPerTransaction: process.env.PRIVACY_CARD_MAX ? process.env.PRIVACY_CARD_MAX : '1000',
     serverUrl: process.env.NODE_ENV === 'production' ? 'https://sandbox.privacy.com/v1/' : 'https://api.privacy.com/v1/'
   },
 

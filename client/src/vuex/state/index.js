@@ -10,6 +10,11 @@ export default {
   
   session: {},
 
+  systemConfig: {
+    maxmimumPerTransaction: null,
+    percentPerTransaction: null
+  },
+
   exchangePrices: {
     btc: null,
     eth: null,

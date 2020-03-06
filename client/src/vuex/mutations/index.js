@@ -18,6 +18,10 @@ export default {
     state.session = sessionObj
   },
 
+  SET_SYSTEM_CONFIG(state, config) {
+    state.systemConfig = config
+  },
+
   SET_CRYPTO_EXCHANGE_PRICE(state, info) {
     const [ type ] = Object.keys(info)
     state.exchangePrices[type] = info[type]

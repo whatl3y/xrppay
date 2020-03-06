@@ -26,10 +26,10 @@ export default function RippleAddrListener({ io, log, postgres, redis }) {
 
         const priv = PrivacyCards(postgres)
         let [ card, user ] = await Promise.all([
-          priv.findBy({ user_id: user.id, is_active: true }),
+          priv.findBy({ user_id: userIdAffected, is_active: true }),
           Users(postgres).find(userIdAffected)
         ])
-        if (!card && wallet && wallet.current_amount > 0)
+        if (!card && updatedWallet && updatedWallet.current_amount > 0)
           card = await priv.createCard(user)
 
         io.in(`user_${userIdAffected}`).emit(`getPrivacyActiveCard`, card)

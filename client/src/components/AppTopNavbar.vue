@@ -24,18 +24,26 @@
       //- form.form-inline.my-2.my-lg-0
       //-   input.form-control.mr-sm-2(type='search', placeholder='Search', aria-label='Search')
       //-   button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Search
-      ul.navbar-nav(v-if="isLoggedIn")
-        li.nav-item
-          a.nav-link(href='/logout') Logout
+      div.d-flex.align-items-center(v-if="isLoggedIn")
+        div#top-nav-per-txn.mr-2.d-flex.align-items-center
+          div(style="color: #a0a0a0; font-size: 10px") {{ perTxnFeePercent }}%
+          b-tooltip(target="#top-nav-per-txn")
+            | A fee of {{ perTxnFeePercent }}% per transaction will be charged to purchase something
+            | when using a virtual card. This helps keep the lights on and this service online.
+        ul.navbar-nav
+          li.nav-item
+            a.nav-link(href='/logout') Logout
 
 </template>
 
 <script>
+  import BigNumber from 'bignumber.js'
   import { mapState } from 'vuex'
 
   export default {
     computed: mapState({
-      isLoggedIn: state => state.isLoggedIn
+      isLoggedIn: state => state.isLoggedIn,
+      perTxnFeePercent: state => new BigNumber(1).minus(state.systemConfig.percentPerTransaction).times(100).toString(),
     })
   }
 </script>

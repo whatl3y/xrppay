@@ -9,8 +9,8 @@ export default function Privacy({ app, socket, log, io, postgres, redis }) {
   const session = SessionHandler(req.session, { redis })
 
   return {
-    async getMaximumSpendPerTransaction() {
-      socket.emit('setMaximumTransaction', config.privacy.maxmimumPerTransaction)
+    async getSystemConfig() {
+      socket.emit('setSystemConfig', config.systemConfig)
     },
 
     async privacyGetActiveCard() {

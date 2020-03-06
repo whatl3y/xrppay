@@ -45,6 +45,10 @@ export default {
     commit('SET_SESSION', session)
   },
 
+  SOCKET_setSystemConfig({ commit }, config) {
+    commit('SET_SYSTEM_CONFIG', config)
+  },
+
   SOCKET_setUserWallet({ commit }, walletRecord) {
     // window.toastr.success(`Your wallet balance was updated.`)
     commit('SET_USER_WALLET', walletRecord)

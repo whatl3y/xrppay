@@ -60,7 +60,7 @@ export default function({ io, log, postgres, redis }) {
 
       // If the transaction record is a new one,
       // send money from user's wallet to cold wallet
-      if (!txnInst.isNewRecord)
+      if (!txnInst.isNewRecord || txnInst.record.result !== 'APPROVED')
         return res.json(true)
 
       const rippleRes = await CryptoWallet(postgres).processTransaction(card.user_id, transactionObject)
@@ -92,14 +92,14 @@ export default function({ io, log, postgres, redis }) {
 
       const amountUsdToAddToCard = currentAmountInWallet
         .times(amountDollarsPerCurrency)
-        .times(config.percentPerTransaction)
+        .times(config.systemConfig.percentPerTransaction)
       const amountUsdCents = amountUsdToAddToCard.times(100)
-      const amountMaxPerTxnCents = new BigNumber(config.privacy.maxmimumPerTransaction).times(100)
+      const amountMaxPerTxnCents = new BigNumber(config.systemConfig.maxmimumPerTransaction).times(100)
       const finalAmountUsdCents = BigNumber.minimum(amountUsdCents, amountMaxPerTxnCents).integerValue(BigNumber.ROUND_DOWN)
 
       const newCardInfo = await PrivacyCards(postgres).updateCard(userId, { limit: finalAmountUsdCents.toNumber() })
       await Promise.all([
-        BackgroundWorker({ redis }).enqueueIn(10 * 60 * 1e3, 'privacyLockCard', { userId }),
+        BackgroundWorker({ redis }).enqueueIn(10 * 60 * 1e3, 'privacyLockCard', { cardId: newCardInfo.id, userId }),
         redis.client.set(
           `burner_card_expiration_key_${userId}`,
           'true', 

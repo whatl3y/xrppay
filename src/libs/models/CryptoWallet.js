@@ -54,7 +54,7 @@ export default function CryptoWallet(postgres) {
           this.findBy({ user_id: userId, type: currencyType }),
           CryptoApi().usdSpotPrice(currencyType)
         ])
-        const percentTake = new BigNumber(1).minus(config.percentPerTransaction)
+        const percentTake = new BigNumber(1).minus(config.systemConfig.percentPerTransaction)
         const amountUsdTxn = new BigNumber(txnObject.amount).dividedBy(100)
         const amountUsdToSend = new BigNumber(amountUsdTxn).times(percentTake).plus(amountUsdTxn)
         const amountXrpToSend = amountUsdToSend.dividedBy(usdPrice.data.amount)

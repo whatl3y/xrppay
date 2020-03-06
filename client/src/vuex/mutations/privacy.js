@@ -3,10 +3,6 @@ export default {
     state.privacy.card = cardRecord
   },
 
-  SET_PRIVACY_MAX_TRANSACTION(state, max) {
-    state.privacy.maxPerTransaction = max
-  },
-
   SET_PRIVACY_CARD_EXPIRATION_TIME(state, expTimeSeconds) {
     state.privacy.activeExpirationSeconds = expTimeSeconds
   }

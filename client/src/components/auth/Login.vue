@@ -5,10 +5,11 @@
         div.card.mt-4
           div.card-header Login
           div.card-body
-            div.form-group
-              label
-                input(type="checkbox",v-model="createAccount")
-                span.ml-1 Create new account?
+            ul.nav.nav-tabs.mb-4
+              li.nav-item
+                a.nav-link(:class="createAccount ? '' : 'active'",@click="createAccount = false") Login
+              li.nav-item
+                a.nav-link(:class="createAccount ? 'active' : ''",@click="createAccount = true") Create Account
             div.form-group
               label(for="username") Email Address
               input#username.form-control(name="username")

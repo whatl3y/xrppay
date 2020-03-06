@@ -1,6 +1,5 @@
 // import newrelic from 'newrelic'
 import minimist from 'minimist'
-// import throng from 'throng'
 import bunyan from 'bunyan'
 import PostgresClient from '../libs/PostgresClient'
 import RedisHelper from '../libs/RedisHelper'
@@ -14,29 +13,22 @@ const log = bunyan.createLogger(config.logger.options)
 const queues = argv.q || argv.queue || argv.queues || config.resque.getAllQueues()
 const queuesAry = (typeof queues === 'string') ? queues.split(',') : queues
 
-const redis             = new RedisHelper()
-const postgres          = new PostgresClient()
+const redis = new RedisHelper()
+const postgres = new PostgresClient()
 const connectionDetails = { redis: redis.client }
 
 const jobs = Jobs.reduce((obj, worker) => Object.assign(obj, worker({ log, postgres, redis })), {})
 
-// entry point to workers
-// throng({
-//   workers:  config.server.concurrency,
-//   lifetime: Infinity,
-//   grace:    3000,
-//   start:    startResqueServer({ connection: connectionDetails, jobs: jobs, log: log, queues: queuesAry })
-// })
-
 ;(async function startResque() {
-  const start = startResqueServer({
+  const { worker } = startResqueServer({
     connection: connectionDetails,
     jobs: jobs,
     log: log,
     queues: queuesAry
   })
 
-  const { multiWorker, scheduler } = await start()
+  const multiWorker = await worker()
+  log.info(`Resque multi worker started...`)
 
   process.on('SIGINT', killProcess)
   process.on('SIGTERM', killProcess)
@@ -44,7 +36,6 @@ const jobs = Jobs.reduce((obj, worker) => Object.assign(obj, worker({ log, postg
   async function killProcess() {
     multiWorker.workers.forEach(worker => multiWorker.cleanupWorker(worker))
     await multiWorker.end()
-    await scheduler.end()
 
     log.info('Shut down worker')
     process.exit()

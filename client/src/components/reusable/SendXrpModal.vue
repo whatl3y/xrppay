@@ -8,6 +8,10 @@
             button.close(type="button",data-dismiss="modal",aria-label="Close")
               span(aria-hidden="true") &times;
           div.modal-body
+            - // TODO: Need to show "Lock card" button/notice if there is an Active
+            - // privacy card for this user, then lock before allowing user to
+            - // send XRP outbound. Also need validation on the backend that there
+            - // are no active cards before sending
             div.form-group
               label(for="send-xrp-address") Destination Ripple Address
               input#send-xrp-address.form-control(v-model="address")
@@ -15,7 +19,7 @@
               label(for="send-xrp-tag") Tag
               input#send-xrp-tag.form-control(v-model="tag")
             div.form-group
-              label(for="send-xrp-amount") Amount XRP (up to #[strong {{ userXrpWalletCurrentAmount }} XRP])
+              label(for="send-xrp-amount") Amount XRP to Send (up to #[strong {{ userXrpWalletCurrentAmount }} XRP])
               input#send-xrp-amount.form-control(v-model="amountXrp")
           div.modal-footer
             button.btn.btn-secondary(type="button",data-dismiss="modal") Cancel

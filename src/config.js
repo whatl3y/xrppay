@@ -54,6 +54,8 @@ export default {
   },
 
   ripple: {
+    coldWalletAddr: process.env.RIPPLE_COLD_X_ADDRESS,
+    coldWalletClassicAddr: process.env.RIPPLE_COLD_CLASSIC_ADDR,
     masterAddr: process.env.RIPPLE_X_ADDRESS,
     masterClassicAddr: process.env.RIPPLE_CLASSIC_ADDR,
     masterAddrSecret: process.env.RIPPLE_SECRET,

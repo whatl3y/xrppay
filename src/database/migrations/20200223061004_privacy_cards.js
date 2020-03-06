@@ -17,7 +17,8 @@ export default [
         spend_limit_duration varchar(20),
         spend_limit integer, -- amount in cents
         created_at timestamptz NOT NULL DEFAULT now(),
-        updated_at timestamptz NOT NULL DEFAULT now()
+        updated_at timestamptz NOT NULL DEFAULT now(),
+        UNIQUE(card_token)
       );
     `)
   },

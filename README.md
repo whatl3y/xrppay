@@ -53,8 +53,8 @@ testing vs. production readiness.
     - `127.0.0.1       dev.xrppay.com`
 2. Install [Homebrew](https://brew.sh/)
 3. Install NodeJS via [nvm](https://github.com/nvm-sh/nvm)
-    - `nvm install 12.15.0`
-    - `nvm alias default 12.15.0`
+    - `nvm install 12.16.1`
+    - `nvm alias default 12.16.1`
 4. Install PostgreSQL via [Postgres.app](https://postgresapp.com/)
     - Create DBs in `psql` or your client of choice
     - `CREATE DATABASE xrppay`

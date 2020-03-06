@@ -15,6 +15,7 @@ import WebSocket from '../websocket/index'
 import PostgresClient from '../libs/PostgresClient'
 import RedisHelper from '../libs/RedisHelper'
 import RippleAddrListener from '../libs/RippleAddrListener'
+import SessionHandler from '../libs/SessionHandler'
 import Routes from '../libs/Routes'
 import config from '../config'
 
@@ -139,6 +140,15 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
 
         passport.serializeUser((user, done) => done(null, user))
         passport.deserializeUser((user, done) => done(null, user))
+
+        io.use((socket, next) => {
+          const req = socket.request
+          const session = SessionHandler(req.session, { redis })
+          const userId = session.getLoggedInUserId()
+          if (!userId)
+            return next(new Error(config.errors['401']))
+          next()
+        })
 
         WebSocket({ io, log, postgres, redis })
         await RippleAddrListener({ io, log, postgres, redis }).listen()

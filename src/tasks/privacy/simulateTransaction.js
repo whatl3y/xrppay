@@ -1,7 +1,6 @@
 import minimist from 'minimist'
 import PostgresClient from '../../libs/PostgresClient'
 import PrivacyAPI from '../../libs/PrivacyAPI'
-// import XrplTransactions from '../../libs/models/XrplTransactions'
 import config from '../../config'
 
 const argv = minimist(process.argv.slice(2))

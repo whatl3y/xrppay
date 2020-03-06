@@ -33,8 +33,8 @@ export default function PrivacyCards(postgres) {
         const cardRes = await PrivacyAPI(config.privacy.apiKey).createCard({
           type: type || 'SINGLE_USE',
           memo: memo || `${user.name || user.username_email}'s Card`,
-          spend_limit_duration: 'TRANSACTION',
-          spend_limit: limit || 0,
+          spend_limit_duration: 'FOREVER',
+          spend_limit: limit || 0,  // NOTE: limit is in cents
           state: state || 'PAUSED'
         })
 
@@ -74,7 +74,7 @@ export default function PrivacyCards(postgres) {
           type: cardRes.type || this.record.type,
           state: cardRes.state || this.record.state,
           spend_limit_duration: cardRes.spend_limit_duration || this.record.spend_limit_duration,
-          spend_limit: cardRes.spend_limit || this.record.spend_limit
+          spend_limit: (typeof cardRes.spend_limit !== 'undefined') ? cardRes.spend_limit : this.record.spend_limit
         })
         const id = await this.save()
         return { ...this.record, id }

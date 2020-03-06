@@ -1,9 +1,9 @@
 import BigNumber from 'bignumber.js'
 // import RippleClient from '../libs/RippleClient'
 import SessionHandler from '../libs/SessionHandler'
+import CryptoTransactions from '../libs/models/CryptoTransactions'
 import CryptoWallet from '../libs/models/CryptoWallet'
 import PrivacyCards from '../libs/models/PrivacyCards'
-import XrplTransactions from '../libs/models/XrplTransactions'
 import { arrayGroupBy } from '../libs/Helpers'
 // import config from '../config'
 
@@ -16,7 +16,7 @@ export default function Wallets({ app, socket, log, io, postgres, redis }) {
     async refreshUserWallet(walletType) {
       // TODO: need to abstract this and support more wallet types in the future
       if (walletType === 'xrp') {
-        const updatedWallet = await XrplTransactions(postgres).refreshUserWallet(user.id)
+        const updatedWallet = await CryptoTransactions(postgres).xrpRefreshUserWallet(user.id)
         socket.emit('setUserWallet', { xrp: updatedWallet })
 
         const currentAmount = new BigNumber(updatedWallet.current_amount)

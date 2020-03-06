@@ -35,7 +35,7 @@ export default function({ io, log, postgres, redis }) {
           new BigNumber(xrpWallet.mod1).toNumber(),
           addr,
           new BigNumber(tag).toNumber(),
-          amount.toString())
+          amount.toFixed(5))
 
         const txn = info.result.tx_json
         const subtractAmount = new BigNumber(txn.Amount).plus(txn.Fee)

@@ -1,7 +1,7 @@
 import minimist from 'minimist'
 import PostgresClient from '../../libs/PostgresClient'
 import RippleClient from '../../libs/RippleClient'
-import XrplTransactions from '../../libs/models/XrplTransactions'
+import CryptoTransactions from '../../libs/models/CryptoTransactions'
 import config from '../../config'
 
 const argv = minimist(process.argv.slice(2))
@@ -28,7 +28,7 @@ const postgres = new PostgresClient()
       await Promise.all(
         transactions.map(async function populateTxn(txn) {
           // console.log("TXN", txn)
-          await XrplTransactions(postgres).createFromTxnObject(txn)
+          await CryptoTransactions(postgres).xrpCreateFromTxnObject(txn)
         })
       )
 

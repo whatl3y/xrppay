@@ -8,7 +8,7 @@
               div
                 | Wallet Balance:
                 | #[i#refresh-wallet.clickable.fa.fa-sync-alt(@click="refreshWallet")]
-                | #[i#send-ripple-button.ml-1.clickable.fa.fa-share(v-if="userXrpWalletCurrentAmount > 1",data-toggle="modal",data-target="#send-xrp-modal")]
+                | #[i#send-ripple-button.ml-1.clickable.fa.fa-share(v-show="userXrpWalletCurrentAmount > 1",data-toggle="modal",data-target="#send-xrp-modal")]
               div.text-large {{ userXrpWalletCurrentAmount }} XRP ≈ ${{ currentAmountUsd }} USD
 
               b-tooltip(target="refresh-wallet",placement="rightbottom")
@@ -62,6 +62,10 @@
           div.row.small-gutters(v-else)
             div.col-lg-6
               div.form-group
+                - //label Card Name
+                div
+                  strong {{ privacyCard.friendly_name }}
+              div.form-group
                 label Card #
                 div.text-large
                   strong {{ cardNumber }}
@@ -80,14 +84,18 @@
                         div
                           strong ${{ privacyCardLimitUsd }}
                     div.col.d-flex.align-items-center.justify-content-end
-                      button#lock-privacy-card.btn.btn-vsm.btn-primary(v-if="privacyCard.state !== 'OPEN'",@click="lockCard") Lock #[i.fa.fa-info-circle]
-                      b-tooltip(target="lock-privacy-card",placement="right")
-                        | Locking your card temporarily adds funds to your card you can spend at
-                        | your merchant of choice (up to a maximum of ${{ maxTransaction }}). We calculate the
-                        | exchange rate of your cryptocurrency wallet at the time you lock the card
-                        | to add funds to it, and the card is active for up to 10 minutes. After 10
-                        | minutes if you don't use your card, it will be paused again and you'll have to 
-                        | re-lock at the latest exchange rate.
+                      div(v-if="privacyCard.state !== 'OPEN'")
+                        button#lock-privacy-card.btn.btn-vsm.btn-primary(@click="lockCard") Lock #[i.fa.fa-info-circle]
+                        b-tooltip(target="lock-privacy-card",placement="right")
+                          | Locking your card temporarily adds funds to your card you can spend at
+                          | your merchant of choice (up to a maximum of ${{ maxTransaction }}). We calculate the
+                          | exchange rate of your cryptocurrency wallet at the time you lock the card
+                          | to add funds to it, and the card is active for up to 10 minutes. After 10
+                          | minutes if you don't use your card, it will be paused again and you'll have to 
+                          | re-lock at the latest exchange rate.
+                      div.small.text-danger(v-else-if="changingCardActiveDuration")
+                        | #[strong {{ changingCardActiveDuration.minutes() }}] min,
+                        | #[strong {{ changingCardActiveDuration.seconds() }}] sec remaining
             div.col-lg-4
               div.form-group
                 label Exp Month
@@ -116,7 +124,11 @@
   export default {
     data() {
       return {
-        spotPriceInterval: null
+        spotPriceInterval: null,
+        
+        privacyActiveSecondsRemaining: null,
+        changingCardActiveDuration: null,
+        changingCardActiveInterval: null
       }
     },
 
@@ -132,6 +144,10 @@
 
         currentAmountUsd(state) {
           return new BigNumber(state.calculateAmountUsd('xrp', this.userXrpWallet.current_amount || 0)).toFixed(2)
+        },
+
+        privacyActiveExpSeconds(state) {
+          return state.privacy.activeExpirationSeconds
         }
       }),
 
@@ -141,6 +157,25 @@
 
       cardNumber() {
         return ((this.privacyCard.card_number || '').match(/\d{4}/g) || []).join(' ')
+      }
+    },
+
+    watch: {
+      privacyActiveExpSeconds(newSeconds) {
+        if (!newSeconds || newSeconds <= 0)
+          return
+
+        this.changingCardActiveInterval = this.changingCardActiveInterval || setInterval(() => {
+          this.privacyActiveSecondsRemaining = (this.privacyActiveSecondsRemaining) ? this.privacyActiveSecondsRemaining - 1 : newSeconds
+          const remainderCardActiveSeconds = moment.duration(this.privacyActiveSecondsRemaining, 'seconds')
+          if (!this.privacyActiveSecondsRemaining || this.privacyActiveSecondsRemaining <= 0) {
+            this.changingCardActiveDuration = null
+            clearInterval(this.changingCardActiveInterval)
+            return this.changingCardActiveInterval = null
+          }
+
+          this.changingCardActiveDuration = remainderCardActiveSeconds
+        }, 1000)
       }
     },
 
@@ -156,18 +191,23 @@
 
       refreshWallet() {
         this.$socket.emit('refreshUserWallet', 'xrp')
-        window.toastr.success(`Sit tight, we're ensuring your wallet balance is correct now!`)
+        window.toastr.success(`Sit tight, we're ensuring your wallet balance is correct!`)
+      },
+
+      async init() {
+        this.$socket.emit('getSpotPrice', { type: 'XRP' })
+        this.$socket.emit('privacyGetActiveCard')
+        this.$socket.emit('rippleGetAddress')
+        this.$socket.emit('walletGetUserWallets')
+        this.$socket.emit('getMaximumSpendPerTransaction')
+
+        this.spotPriceInterval = this.spotPriceInterval || setInterval(() => this.$socket.emit('getSpotPrice', { type: 'XRP' }), 10000)
       }
     },
 
-    created() {
-      this.spotPriceInterval = setInterval(() => this.$socket.emit('getSpotPrice', { type: 'XRP' }), 10000)
-
-      this.$socket.emit('getSpotPrice', { type: 'XRP' })
-      this.$socket.emit('privacyGetActiveCard')
-      this.$socket.emit('rippleGetAddress')
-      this.$socket.emit('walletGetUserWallets')
-      this.$socket.emit('getMaximumSpendPerTransaction')
+    async created() {
+      this.$socket.on('refresh', async () => await this.init)
+      await this.init()
     },
     
     beforeDestroy() {

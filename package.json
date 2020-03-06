@@ -4,7 +4,7 @@
   "author": "Lance Whatley <whatl3y@gmail.com>",
   "description": "Pay for things with temporary credit cards using XRP (Ripple)",
   "engines": {
-    "node": "12.15.0"
+    "node": "12.16.1"
   },
   "repository": {
     "type": "git",
@@ -18,9 +18,10 @@
     "model": "node dist/tasks/database/model",
     "postinstall": "npm run build",
     "resqueRetry": "node dist/tasks/resque/retryFailedJobs",
+    "scheduler": "node dist/bin/resqueScheduler",
     "start": "pm2-runtime start ecosystem.config.js",
     "test": "NODE_ENV=test mocha --exit --require @babel/register --recursive './src/**/*.spec.js'",
-    "worker": "node dist/bin/resque_worker"
+    "worker": "node dist/bin/resqueWorker"
   },
   "devDependencies": {
     "@babel/register": "^7.8.3",
@@ -54,7 +55,7 @@
     "minimist": "^1.2.0",
     "moment": "^2.24.0",
     "newrelic": "^6.3.0",
-    "node-resque": "^6.0.6",
+    "node-resque": "^7.0.1",
     "nodemailer": "^6.4.2",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",

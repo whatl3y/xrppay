@@ -14,6 +14,8 @@ export default function PrivacyWorkers({ redis, postgres }) {
       perform: async options => {
         const userId = options.userId
         await PrivacyCards(postgres).updateCard(userId, { limit: 0, state: 'PAUSED' })
+
+        // TODO: send websocket or upstream request to update user
       }
     }
   }

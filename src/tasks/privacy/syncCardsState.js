@@ -26,50 +26,50 @@ const redis = new RedisHelper()
       card_token: cardToken
     })
 
-    await Promise.all(
-      transactions.map(async txn => {
-        const cards = PrivacyCards(postgres)
-        const locTxn = PrivacyCardTransactions(postgres)
-        const card = await cards.findBy({ card_token: txn.card.token })
-        if (!card)
-          return
+    for (let i = 0; i < transactions.length; i++) {
+      const txn = transactions[i]
 
-        await locTxn.findOrCreateBy({ privacy_card_id: card.id, transaction_token: txn.token })
-        locTxn.setRecord({
-          amount_cents: txn.amount,
-          settled_amount_cents: txn.settled_amount,
-          status: txn.status,
-          result: txn.result,
-          transaction_created_at: txn.created,
-          merchant_descriptor: txn.merchant.descriptor,
-          merchant_city: txn.merchant.city,
-          merchant_state: txn.merchant.state,
-          merchant_country: txn.merchant.country
-        })
-        cards.setRecord({
-          id: card.id,
-          is_active: false,
-          state: txn.card.state,
-          spend_limit_duration: txn.card.spend_limit_duration,
-          spend_limit: txn.card.spend_limit
-        })
+      const cards = PrivacyCards(postgres)
+      const locTxn = PrivacyCardTransactions(postgres)
+      const card = await cards.findBy({ card_token: txn.card.token })
+      if (!card)
+        return
 
-        await Promise.all([
-          locTxn.save(),
-          cards.save()
-        ])
-
-        // If the transaction record is a new one,
-        // send money from user's wallet to cold wallet
-        if (!locTxn.isNewRecord)
-          return
-
-        const rippleRes = await CryptoWallet(postgres).processTransaction(card.user_id, txn)
-        console.log(`Response from sending XRP to cold wallet`, rippleRes)
-
-        // TODO: Refresh affected users wallet balance
+      await locTxn.findOrCreateBy({ privacy_card_id: card.id, transaction_token: txn.token })
+      locTxn.setRecord({
+        amount_cents: txn.amount,
+        settled_amount_cents: txn.settled_amount,
+        status: txn.status,
+        result: txn.result,
+        transaction_created_at: txn.created,
+        merchant_descriptor: txn.merchant.descriptor,
+        merchant_city: txn.merchant.city,
+        merchant_state: txn.merchant.state,
+        merchant_country: txn.merchant.country
       })
-    )
+      cards.setRecord({
+        id: card.id,
+        is_active: false,
+        state: txn.card.state,
+        spend_limit_duration: txn.card.spend_limit_duration,
+        spend_limit: txn.card.spend_limit
+      })
+
+      await Promise.all([
+        locTxn.save(),
+        cards.save()
+      ])
+
+      // If the transaction record is a new one,
+      // send money from user's wallet to cold wallet
+      if (!locTxn.isNewRecord)
+        return
+
+      const rippleRes = await CryptoWallet(postgres).processTransaction(card.user_id, txn)
+      console.log(`Response from sending XRP to cold wallet`, rippleRes)
+
+      // TODO: Refresh affected users wallet balance
+    }
 
     await redis.client.set(lastSyncKey, moment().subtract(1, 'day').format('YYYY-MM-DD'), 'EX', 60 * 60)
     console.log("Successfully synced card transactions")

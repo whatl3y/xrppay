@@ -20,7 +20,7 @@
     "resqueRetry": "node dist/tasks/resque/retryFailedJobs",
     "scheduler": "node dist/bin/resqueScheduler",
     "start": "pm2-runtime start ecosystem.config.js",
-    "test": "NODE_ENV=test mocha --exit --require @babel/register --recursive './src/**/*.spec.js'",
+    "test": "NODE_ENV=test mocha --exit --require @babel/register --recursive './src/**/*.spec.js' --grep jsonStringifyAndSortKeys",
     "worker": "node dist/bin/resqueWorker"
   },
   "devDependencies": {
@@ -52,6 +52,7 @@
     "gulp-babel": "^8.0.0",
     "gulp-plumber": "^1.2.1",
     "ioredis": "^4.14.1",
+    "json-stable-stringify": "^1.0.1",
     "minimist": "^1.2.0",
     "moment": "^2.24.0",
     "newrelic": "^6.3.0",

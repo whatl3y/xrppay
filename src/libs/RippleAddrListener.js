@@ -3,7 +3,6 @@ import RippleClient from './RippleClient'
 import PrivacyCards from './models/PrivacyCards'
 import CryptoTransactions from './models/CryptoTransactions'
 import Users from './models/Users'
-// import CryptoWallet from './models/CryptoWallet'
 import config from '../config'
 
 export default function RippleAddrListener({ io, log, postgres, redis }) {
@@ -18,9 +17,9 @@ export default function RippleAddrListener({ io, log, postgres, redis }) {
           ? 'credit'
           : 'debit'
 
-        const userIdAffected = txnType === 'credit' ? txn.destination_tag : txn.source_tag
+        const userIdAffected = txnType === 'credit' ? txn.destination_user_id : txn.source_user_id
         if (!userIdAffected)
-          return
+          return log.info(`Didn't find user ID of affected transaction so short-circuiting.`)
 
         const updatedWallet = await CryptoTransactions(postgres).xrpRefreshUserWallet(userIdAffected)
         io.in(`user_${userIdAffected}`).emit('setUserWallet', { xrp: updatedWallet })

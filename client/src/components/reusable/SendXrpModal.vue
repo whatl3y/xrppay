@@ -13,13 +13,13 @@
             - // send XRP outbound. Also need validation on the backend that there
             - // are no active cards before sending
             div.form-group
-              label(for="send-xrp-address") Destination Ripple Address
+              label(for="send-xrp-address") Destination Ripple Address#[sup.text-danger *]
               input#send-xrp-address.form-control(v-model="address")
             div.form-group
-              label(for="send-xrp-tag") Tag
+              label(for="send-xrp-tag") Tag#[sup.text-danger *]
               input#send-xrp-tag.form-control(v-model="tag")
             div.form-group
-              label(for="send-xrp-amount") Amount XRP to Send (up to #[strong {{ userXrpWalletCurrentAmount }} XRP])
+              label(for="send-xrp-amount") Amount XRP to Send#[sup.text-danger *] (up to #[strong {{ userXrpWalletCurrentAmount }} XRP])
               input#send-xrp-amount.form-control(v-model="amountXrp")
           div.modal-footer
             button.btn.btn-secondary(type="button",data-dismiss="modal") Cancel

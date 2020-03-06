@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import BigNumber from 'bignumber.js'
 import BackgroundWorker from '../../../../libs/BackgroundWorker'
 import SessionHandler from '../../../../libs/SessionHandler'
@@ -22,7 +23,7 @@ export default function({ io, log, postgres, redis }) {
       const transactionObject = req.body
 
       const generatedHmac = privacy.generateHmac(transactionObject)
-      if (generatedHmac !== privacyHmacToken) {
+      if (!crypto.timingSafeEqual(Buffer.from(generatedHmac), Buffer.from(privacyHmacToken))) {
         log.error(`HMAC token from Privacy transaction doesn't match`, privacyHmacToken, generatedHmac, req.body)
         return res.sendStatus(400)
       }

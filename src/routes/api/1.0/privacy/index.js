@@ -28,6 +28,11 @@ export default function({ io, log, postgres, redis }) {
       }
 
       const card = await cards.findBy({ card_token: transactionObject.card.token })
+      if (!card) {
+        log.info(`No user with card of transaction provided`, req.body)
+        return res.json(true)
+      }
+
       await txnInst.findOrCreateBy({ privacy_card_id: card.id, transaction_token: transactionObject.token })
 
       txnInst.setRecord({

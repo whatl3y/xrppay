@@ -33,7 +33,7 @@ const redis = new RedisHelper()
       const locTxn = PrivacyCardTransactions(postgres)
       const card = await cards.findBy({ card_token: txn.card.token })
       if (!card)
-        return
+        continue
 
       await locTxn.findOrCreateBy({ privacy_card_id: card.id, transaction_token: txn.token })
       locTxn.setRecord({
@@ -60,14 +60,14 @@ const redis = new RedisHelper()
       // If the transaction record is a new one,
       // send money from user's wallet to cold wallet
       if (!locTxn.isNewRecord)
-        return
+        continue
 
       const rippleRes = await CryptoWallet(postgres).processTransaction(card.user_id, txn)
       console.log(`Response from sending XRP to cold wallet`, rippleRes)
 
       // TODO: Refresh affected users wallet balance
 
-      
+
       // Save the card info last so we don't prematurely deactivate
       // it before sending XRP to our cold wallet (i.e. allowing
       // the user to potentially spend their wallet balance more

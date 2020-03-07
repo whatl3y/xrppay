@@ -2,7 +2,7 @@
   div
     ul.nav.nav-tabs.mb-4
       li.nav-item
-        a.nav-link(:class="activeTab === 'activeCard' && 'active'",@click="activeTab = 'activeCard'") Active Card
+        a.nav-link(:class="activeTab === 'activeCard' && 'active'",@click="activeTab = 'activeCard'") Current Card
       li.nav-item
         a.nav-link(:class="activeTab === 'txnHistory' && 'active'",@click="activeTab = 'txnHistory'") Transaction History
     div(v-if="activeTab === 'activeCard'")
@@ -14,9 +14,9 @@
       div.row.small-gutters(v-else)
         div.col-12.mb-4.text-center.small
           | Use your virtual card anywhere online that accepts Visa prepaid debit cards.
-          | After you #[button.btn.btn-vsm.btn-primary(@click="lockCard") Lock] your
+          | After you #[button.btn.btn-vsm.btn-primary(@click="activateCard") Activate] your
           | card below your card will be temporarily loaded with funds up to the
-          | amount available in your wallet (max of ${{ maxTransaction }} per transaction).
+          | amount available in your wallet (max ${{ maxTransaction }} USD per transaction).
         div.col-12
           div.form-group
             - //label Card Name
@@ -36,38 +36,38 @@
               div.row.small-gutters
                 div.col-lg-4.mb-3
                   div.form-group.m-0
+                    label State
+                    div(:class="privacyCard.state === 'OPEN' ? 'text-success' : 'text-danger'")
+                      strong {{ privacyCard.state }}
+                div.col-lg-4.mb-3
+                  div.form-group.m-0
                     label Type
                     div
                       strong {{ privacyCard.type.replace(/_/g, ' ') }}
                 div.col-lg-4.mb-3
                   div.form-group.m-0
-                    label State
-                    div
-                      strong {{ privacyCard.state }}
-                div.col-lg-4.mb-3
-                  div.form-group.m-0
                     label.nowrap Spend Limit #[i#spend-limit-info.fa.fa-info-circle]
                     b-tooltip(target="#spend-limit-info")
                       | Your spend limit will be up to the amount of currency in your wallet
-                      | (up to a max of ${{ maxTransaction }}) minus {{ percentTake }}% that
+                      | (max of ${{ maxTransaction }} USD) minus {{ percentTake }}% that
                       | is taken as a fee on any transaction you make. This pays our bills
                       | so we can keep this service up and running.
                     div
                       strong ${{ privacyCardLimitUsd }}
                 div.col-12.d-flex.justify-content-center
                   div
-                    button#lock-privacy-card.btn.btn-lg.btn-primary(@click="lockCard") Lock #[i.fa.fa-info-circle]
-                    b-tooltip(target="lock-privacy-card",placement="right")
-                      | Locking your card temporarily adds funds to your card you can spend at
-                      | your merchant of choice (up to a maximum of ${{ maxTransaction }} per transaction).
-                      | We calculate the exchange rate of your cryptocurrency wallet at the time you lock the card
+                    button#activate-privacy-card.btn.btn-lg.btn-primary(@click="activateCard") Activate #[i.fa.fa-info-circle]
+                    b-tooltip(target="activate-privacy-card",placement="right")
+                      | Activating your card temporarily adds funds you can spend at
+                      | your merchant of choice (max of ${{ maxTransaction }} USD per transaction).
+                      | We calculate the exchange rate of your cryptocurrency wallet at the time you activate the card
                       | to add funds to it, and the card is active for up to 10 minutes. After 10
                       | minutes if you don't use your card, it will be paused again and you'll have to 
-                      | re-lock at the latest exchange rate.
+                      | reactivate at the latest exchange rate.
           div.mt-2.text-danger.text-center(v-if="privacyCard.state === 'OPEN' && changingCardActiveDuration")
             div.mb-2.small
               | Your card is loaded and ready to use. After the following
-              | time it will be PAUSED and require relocking at the latest
+              | time it will be PAUSED and require reactivating at the latest
               | exchange rate.
             div
               | #[strong {{ changingCardActiveDuration.minutes() }}] min,
@@ -132,10 +132,10 @@
     },
 
     methods: {
-      async lockCard() {
+      async activateCard() {
         try {
-          await ApiPrivacy.lockBurnerCard()
-          window.toastr.success(`Successfully updated your card! Your spend limit is updated, please use your card within 10 minutes or you will have to relock it later.`)
+          await ApiPrivacy.activateBurnerCard()
+          window.toastr.success(`Successfully updated your card! Your spend limit is updated, please use your card within 10 minutes or you will have to reactivate it later.`)
         } catch(err) {
           window.toastr.error(err.message)
         }

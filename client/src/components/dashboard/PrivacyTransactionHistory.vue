@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.table-responsive
+  div.table-responsive.m-0
     table.table.table-striped.table-bordered
       thead
         tr
@@ -18,7 +18,7 @@
           td {{ txn.merchant_descriptor }}
           td ${{ formatMoney(txn.amount_cents) }}
           td {{ txn.result }}
-        tr
+        tr(v-if="transactions.numberPages > 1")
           td(colspan="100%")
             div.d-flex.justify-content-end
               pagination(

@@ -14,6 +14,19 @@ const privacy = PrivacyAPI(config.privacy.apiKey)
 
 export default function({ io, log, postgres, redis }) {
   return {
+    async ['transaction/history'](req, res) {
+      const session = SessionHandler(req.session, { redis })
+      const txnInst = PrivacyCardTransactions(postgres)
+      const userId = session.getLoggedInUserId()
+      const {
+        page,
+        perPage
+      } = req.query
+
+      const transactions = await txnInst.getPage(userId, page, perPage)
+      res.json({ transactions })
+    },
+
     // https://developer.privacy.com/docs#transaction-webhooks
     async ['card/transaction'](req, res) {
       const cards = PrivacyCards(postgres)

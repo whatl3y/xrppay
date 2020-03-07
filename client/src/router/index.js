@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 const AuthError = () => import('@/components/auth/AuthError')
+const AuthVerification = () => import('@/components/auth/AuthVerification')
 const DashboardHome = () => import('@/components/dashboard/Home')
 const Login = () => import('@/components/auth/Login')
 
@@ -26,6 +27,12 @@ export function getRoutes() {
       path: '/login',
       component: Login,
       title: 'Login/Create Account',
+      subTitle: 'xrppay'
+    },
+    {
+      path: '/verification/pending',
+      component: AuthVerification,
+      title: 'Verify Your Account',
       subTitle: 'xrppay'
     },
     {

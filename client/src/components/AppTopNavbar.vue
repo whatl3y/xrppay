@@ -25,7 +25,7 @@
       //-   input.form-control.mr-sm-2(type='search', placeholder='Search', aria-label='Search')
       //-   button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Search
       div.d-flex.align-items-center(v-if="isLoggedIn")
-        div#top-nav-per-txn.mr-2.d-flex.align-items-center
+        div#top-nav-per-txn.mr-2.d-flex.align-items-center(v-if="perTxnFeePercent")
           div(style="color: #a0a0a0; font-size: 10px") {{ perTxnFeePercent }}%
           b-tooltip(target="#top-nav-per-txn")
             | A fee of {{ perTxnFeePercent }}% per transaction will be charged to purchase something
@@ -43,7 +43,7 @@
   export default {
     computed: mapState({
       isLoggedIn: state => state.isLoggedIn,
-      perTxnFeePercent: state => new BigNumber(1).minus(state.systemConfig.percentPerTransaction).times(100).toString(),
+      perTxnFeePercent: state => state.systemConfig.percentPerTransaction && new BigNumber(1).minus(state.systemConfig.percentPerTransaction).times(100).toString(),
     })
   }
 </script>

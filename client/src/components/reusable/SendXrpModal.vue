@@ -61,7 +61,7 @@
             tag: this.tag,
             amount: this.amountXrp
           })
-          window.toastr.success(`Successfully initiated a request to send XRP to the ${this.address}.`)
+          window.toastr.success(`Successfully initiated a request to send XRP to address: ${this.address}`)
           $( `#${this.$el.id}` ).modal('hide')
           Object.assign(this.$data, defaultData())
 

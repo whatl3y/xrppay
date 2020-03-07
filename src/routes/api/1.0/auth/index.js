@@ -93,6 +93,18 @@ export default function({ log, postgres, redis }) {
       await users.save()
 
       res.json(true)
+    },
+
+    async ['resend/verification'](req, res) {
+      const session = SessionHandler(req.session, { redis })
+      const userRec = session.getLoggedInUserId(true)
+  
+      await BackgroundWorker({ redis }).enqueue('sendVerificationMailer', {
+        userEmail: userRec.username_email,
+        verificationCode: userRec.verification_code
+      }, config.resque.mailer_queue)
+  
+      res.json(true)
     }
   }
 }

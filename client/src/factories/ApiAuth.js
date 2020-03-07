@@ -11,10 +11,10 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  // async resendVerification() {
-  //   const response = await XrppayFetch(`/api/1.0/auth/resend/verification`)
-  //   return await handleFetchResponse(response)
-  // },
+  async resendVerification() {
+    const response = await XrppayFetch(`/api/1.0/auth/resend/verification`)
+    return await handleFetchResponse(response)
+  },
 
   async forgotPassword(email) {
     const response = await XrppayFetch(`/api/1.0/auth/password/forgot`, {

@@ -1,15 +1,18 @@
 import BigNumber from 'bignumber.js'
+import PrivacyAPI from '../../../../libs/PrivacyAPI'
 import RippleClient from '../../../../libs/RippleClient'
 import SessionHandler from '../../../../libs/SessionHandler'
 import CryptoWallet from '../../../../libs/models/CryptoWallet'
+import PrivacyCards from '../../../../libs/models/PrivacyCards'
 import config from '../../../../config'
 
 export default function({ io, log, postgres, redis }) {
   return {
     async ['xrp/send'](req, res) {
       try {
-        const ripple = RippleClient()
+        const ripple  = RippleClient()
         const wallets = CryptoWallet(postgres)
+        const cards   = PrivacyCards(postgres)
         const session = SessionHandler(req.session, { redis })
         const user = session.getLoggedInUserId(true)
         const {
@@ -29,6 +32,17 @@ export default function({ io, log, postgres, redis }) {
 
         if (currentAmount.isLessThan(amountToSend))
           return res.status(400).json({ error: `You are trying to send more XRP than is in your wallet. Please specify an amount up to your wallet amount.` })
+
+        // pause privacy card if it's open so it's no longer usable and
+        // needs to be relocked to use at a merchant
+        const cardRecord = await cards.findBy({ user_id: user.id, is_active: true })
+        if (cardRecord) {
+          const [ card ] = await PrivacyAPI(config.privacy.apiKey).listCards({ card_token: cardRecord.card_token })
+          if (card.state === 'OPEN') {
+            const updatedCard = await cards.updateCard(user.id, { limit: 0, state: 'PAUSED' })
+            io.in(`user_${user.id}`).emit(`getPrivacyActiveCard`, updatedCard)
+          }
+        }
 
         const info = await ripple.sendPayment(
           xrpWallet.mod2,

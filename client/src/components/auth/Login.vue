@@ -20,7 +20,7 @@
               label(for="cpassword") Confirm Password
               input#cpassword.form-control(name="cpassword",type="password")
             div.form-group.text-center
-              button.btn.btn-primary Login
+              button.btn.btn-primary {{ createAccount ? 'Create Account' : 'Login' }}
             hr
             div.form-group.small.text-center
               a(data-toggle="modal",data-target="#forgot-password-modal") Forgot password?

@@ -45,6 +45,10 @@ export default {
     commit('SET_SESSION', session)
   },
 
+  SOCKET_mainNotification({ commit }, notification) {
+    commit('SET_MAIN_NOTIFICATION', notification)
+  },
+
   SOCKET_setSystemConfig({ commit }, config) {
     commit('SET_SYSTEM_CONFIG', config)
   },

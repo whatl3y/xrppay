@@ -2,6 +2,9 @@
   div#app.container-fluid.h-100
     div.main-navbar.sticky-top.bg-white.border-bottom.row
       app-top-navbar.w-100
+      div.w-100.alert.alert-danger.text-center.rounded-0.mb-0(
+        v-if="mainNotification",
+        v-html="mainNotification")
     div.container
       loader(v-if="isLoading")
       router-view#main-content(v-else)
@@ -12,7 +15,6 @@
 <script>
   import { mapState } from 'vuex'
   import $ from 'jquery'
-  // import XrppaySocket from '../factories/XrppaySocket'
   import AppTopNavbar from './AppTopNavbar'
   import ResetPasswordModal from './auth/ResetPasswordModal'
 
@@ -21,6 +23,7 @@
 
     computed: mapState({
       isLoading: state => state.isLoading,
+      mainNotification: state => state.mainNotification,
       user: state => state.session.user
     }),
 

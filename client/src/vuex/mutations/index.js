@@ -14,6 +14,10 @@ export default {
     state.isLoggedIn = isLoggedIn
   },
 
+  SET_MAIN_NOTIFICATION(state, notification) {
+    state.mainNotification = notification
+  },
+
   SET_SESSION(state, sessionObj) {
     state.session = sessionObj
   },

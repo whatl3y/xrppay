@@ -1,4 +1,4 @@
-import { addToRoom, getUsers } from './index'
+import { addToRoom } from './index'
 import SessionHandler from '../libs/SessionHandler'
 
 export default function Global({ app, socket, log, io, postgres, redis }) {
@@ -10,6 +10,7 @@ export default function Global({ app, socket, log, io, postgres, redis }) {
       const userRecord = session.getLoggedInUserId(true)
       const loggedIn = !!userRecord
       socket.emit('isLoggedIn', userRecord)
+      socket.emit('mainNotification', process.env.MAIN_NOTIFICATION)
 
       await app.set('socketPage', socket.id, { date: new Date(), page: pagePath })
 

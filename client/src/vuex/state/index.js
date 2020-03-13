@@ -7,6 +7,7 @@ export default {
 
   isLoading: true,
   isLoggedIn: false,
+  mainNotification: null,
   
   session: {},
 

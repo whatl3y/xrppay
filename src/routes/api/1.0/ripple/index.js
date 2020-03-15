@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import CryptoApi from '../../../../libs/CryptoApi'
 import PrivacyAPI from '../../../../libs/PrivacyAPI'
 import RippleClient from '../../../../libs/RippleClient'
 import SessionHandler from '../../../../libs/SessionHandler'
@@ -68,6 +69,36 @@ export default function({ io, log, postgres, redis }) {
         log.error(`Error sending XRP`, err)
         res.status(500).json({ error: err.message })
       }
+    },
+
+    async ['cold/wallet'](req, res) {
+      const api     = CryptoApi()
+      const ripple  = RippleClient()
+      const session = SessionHandler(req.session)
+      const user = session.getLoggedInUserId(true)
+
+      if (user.username_email !== 'whatl3y@gmail.com')
+        return res.status(401).json({ error: `You must be an admin to get here.` })
+
+      if (!config.ripple.coldWalletAddr)
+        return res.status(400).json({ error: `No cold wallet available to check.` })
+
+      const response = await ripple.getBalances(config.ripple.coldWalletAddr)
+      const resWithUsd = await Promise.all(
+        response.map(async balance => {
+          try {
+            const usdExchangeRate = await api.usdSpotPrice(balance.currency)
+            return {
+              ...balance,
+              usdEstimate: new BigNumber(balance.value).times(usdExchangeRate.data.amount).toString()
+            }
+          } catch(err) {
+            return balance
+          }
+        })
+      )
+
+      res.json(resWithUsd)
     }
   }
 }

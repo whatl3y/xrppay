@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "gulp build",
-    "dev": "nodemon --exec 'nf start'",
+    "dev": "gulp start",
     "generateXrpAddress": "node dist/tasks/xrpl/generateAddress",
     "migrate": "node dist/tasks/database/migrate",
     "model": "node dist/tasks/database/model",
@@ -27,8 +27,7 @@
     "@babel/register": "^7.8.3",
     "foreman": "^3.0.1",
     "ioredis-mock": "^4.8.2",
-    "mocha": "^5.2.0",
-    "nodemon": "^2.0.2"
+    "mocha": "^5.2.0"
   },
   "dependencies": {
     "@babel/core": "^7.8.4",
@@ -50,6 +49,7 @@
     "express-session": "^1.15.6",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
+    "gulp-nodemon": "^2.5.0",
     "gulp-plumber": "^1.2.1",
     "ioredis": "^4.14.1",
     "json-stable-stringify": "^1.0.1",

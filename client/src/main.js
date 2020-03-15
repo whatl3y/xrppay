@@ -20,7 +20,7 @@ import './css/app.scss'
 
 Vue.use(
   new VueSocketIO({
-    debug: true,
+    debug: window.webpackHotUpdate,
     connection: XrppaySocket,
     vuex: {
       store,
